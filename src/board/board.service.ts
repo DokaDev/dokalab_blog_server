@@ -57,6 +57,22 @@ export class BoardService {
   }
 
   /**
+   * Test method - Get boards using regular findMany (not fluent API)
+   * @param id Board Group ID
+   * @returns Array of BoardDto
+   */
+  // async testNonFluentFindBoardsByBoardGroupId(id: number): Promise<BoardDto[]> {
+  //   const boards = await this.prisma.board.findMany({
+  //     where: {
+  //       boardGroupId: id,
+  //       deletedAt: null,
+  //     },
+  //   });
+
+  //   return plainToInstance(BoardDto, boards);
+  // }
+
+  /**
    * Create a new board
    * @param data Board creation input
    * @returns Created BoardDto

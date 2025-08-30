@@ -25,7 +25,10 @@ export class BoardGroupResolver {
     description: 'List of boards in the group',
   })
   async boards(@Parent() boardGroup: BoardGroupDto): Promise<BoardDto[]> {
-    return await this.boardService.findBoardsByBoardGroupId(boardGroup.id);
+    return await this.boardService.findBoardsByBoardGroupId(boardGroup.id); // Fluent API
+    // return await this.boardService.testNonFluentFindBoardsByBoardGroupId(
+    //   boardGroup.id,
+    // ); // Regular findMany
   }
 
   // -------------------
