@@ -13,6 +13,7 @@ import { BoardService } from './board.service';
 import { BoardDto } from './dto/board.dto';
 import { BoardGroupDto } from 'src/boardgroup/dto/board-group.dto';
 import { CreateBoardInput } from './dto/create-board.input';
+import { PostDto } from 'src/post/dto/post.dto';
 
 @Resolver(() => BoardDto)
 export class BoardResolver {
@@ -25,6 +26,11 @@ export class BoardResolver {
   })
   async boardGroup(@Parent() board: BoardDto): Promise<BoardGroupDto | null> {
     return await this.boardService.findByBoardId(board.id);
+  }
+
+  @ResolveField(() => [PostDto])
+  async posts(@Parent() board: BoardDto): Promise<PostDto[]> {
+    return await this.boardService.findPostsByBoardId(board.id);
   }
 
   // --------------------

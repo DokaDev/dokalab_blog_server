@@ -1,5 +1,6 @@
 import { Field, ObjectType, GraphQLISODateTime, Int } from '@nestjs/graphql';
 import { BoardGroupDto } from 'src/boardgroup/dto/board-group.dto';
+import { PostDto } from 'src/post/dto/post.dto';
 
 @ObjectType()
 export class BoardDto {
@@ -34,4 +35,7 @@ export class BoardDto {
     nullable: true,
   })
   boardGroup: BoardGroupDto | null;
+
+  @Field(() => [PostDto])
+  posts: PostDto[];
 }

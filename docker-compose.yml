@@ -1,18 +1,5 @@
 # docker compose up -d --build
 services:
-  db:
-    image: postgres:17-alpine
-    container_name: dokalab_blog_db_postgres
-    environment:
-      POSTGRES_USER: awesome
-      POSTGRES_PASSWORD: rlaehdgnl123
-      POSTGRES_DB: dokalab_blog_db
-    ports:
-      - "5436:5432"
-    volumes:
-      - dokalab_blog_db:/var/lib/postgresql/data
-    networks:
-      - dokalab_blog_network
   app:
     build: .
     container_name: dokalab_blog_server
@@ -23,10 +10,6 @@ services:
     env_file:
       - .env
       # - .env.local
-
-volumes:
-  dokalab_blog_db:
-    driver: local
 
 networks:
   dokalab_blog_network:
