@@ -14,9 +14,9 @@ export class BoardGroupService {
   }
 
   async findByBoardId(id: number): Promise<BoardGroupDto | null> {
-    const boardGroup = await this.prisma.boardGroup.findFirst({
-      where: { boards: { some: { id } } },
-    });
+    const boardGroup = await this.prisma.board
+      .findUnique({ where: { id } })
+      ?.boardGroup();
 
     if (!boardGroup) {
       return null;
