@@ -4,6 +4,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { BoardModule } from './board/board.module';
 import { BoardGroupModule } from './boardgroup/board-group.module';
+import { PostModule } from './post/post.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { BoardGroupModule } from './boardgroup/board-group.module';
     }),
     BoardModule,
     BoardGroupModule,
+    PostModule,
   ],
   controllers: [],
   providers: [],

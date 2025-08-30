@@ -10,6 +10,12 @@ export class BoardDto {
   title: string;
 
   @Field({ description: 'Slug of Board(e.g. Development -> devel)' })
+  // @Transform(({ value }): { value: string } => ({
+  //   value:
+  //     typeof value === 'string'
+  //       ? value.trim().toLowerCase().replace(/\s+/g, '-')
+  //       : String(value),
+  // }))
   slug: string;
 
   @Field(() => GraphQLISODateTime, {

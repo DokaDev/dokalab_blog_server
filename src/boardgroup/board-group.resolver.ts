@@ -11,24 +11,17 @@ import {
 import { BoardGroupService } from './board-group.service';
 import { BoardGroupDto } from './dto/board-group.dto';
 import { BoardDto } from 'src/board/dto/board.dto';
-import { BoardService } from 'src/board/board.service';
 import { CreateBoardGroupInput } from './dto/create-board-group.input';
 
 @Resolver(() => BoardGroupDto)
 export class BoardGroupResolver {
-  constructor(
-    private readonly boardGroupService: BoardGroupService,
-    private readonly boardService: BoardService,
-  ) {}
+  constructor(private readonly boardGroupService: BoardGroupService) {}
 
   @ResolveField(() => [BoardDto], {
     description: 'List of boards in the group',
   })
   async boards(@Parent() boardGroup: BoardGroupDto): Promise<BoardDto[]> {
-    return await this.boardService.findBoardsByBoardGroupId(boardGroup.id); // Fluent API
-    // return await this.boardService.testNonFluentFindBoardsByBoardGroupId(
-    //   boardGroup.id,
-    // ); // Regular findMany
+    return await this.boardGroupService.findBoardsByBoardGroupId(boardGroup.id); // Fluent API
   }
 
   // -------------------

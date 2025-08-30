@@ -9,7 +9,6 @@ import {
 } from '@nestjs/graphql';
 
 import { BoardService } from './board.service';
-import { BoardGroupService } from '../boardgroup/board-group.service';
 
 import { BoardDto } from './dto/board.dto';
 import { BoardGroupDto } from 'src/boardgroup/dto/board-group.dto';
@@ -17,10 +16,7 @@ import { CreateBoardInput } from './dto/create-board.input';
 
 @Resolver(() => BoardDto)
 export class BoardResolver {
-  constructor(
-    private readonly boardService: BoardService,
-    private readonly boardGroupService: BoardGroupService,
-  ) {}
+  constructor(private readonly boardService: BoardService) {}
 
   // --------------------
   @ResolveField(() => BoardGroupDto, {
@@ -28,7 +24,7 @@ export class BoardResolver {
     nullable: true,
   })
   async boardGroup(@Parent() board: BoardDto): Promise<BoardGroupDto | null> {
-    return await this.boardGroupService.findByBoardId(board.id);
+    return await this.boardService.findByBoardId(board.id);
   }
 
   // --------------------

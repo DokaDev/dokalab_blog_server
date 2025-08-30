@@ -3,6 +3,7 @@ import { PrismaService } from 'src/adapters/prisma/prisma.service';
 import { BoardGroupDto } from './dto/board-group.dto';
 import { plainToInstance } from 'class-transformer';
 import { CreateBoardGroupInput } from './dto/create-board-group.input';
+import { BoardDto } from 'src/board/dto/board.dto';
 
 @Injectable()
 export class BoardGroupService {
@@ -13,15 +14,16 @@ export class BoardGroupService {
     return plainToInstance(BoardGroupDto, boardGroups);
   }
 
-  async findByBoardId(id: number): Promise<BoardGroupDto | null> {
-    const boardGroup = await this.prisma.board
-      .findUnique({ where: { id } })
-      ?.boardGroup();
+  async findBoardsByBoardGroupId(id: number): Promise<BoardDto[]> {
+    const boards = await this.prisma.boardGroup
+      .findUnique({ where: { id: id } })
+      ?.boards({
+        where: {
+          deletedAt: null,
+        },
+      });
 
-    if (!boardGroup) {
-      return null;
-    }
-    return plainToInstance(BoardGroupDto, boardGroup);
+    return boards ? plainToInstance(BoardDto, boards) : [];
   }
 
   async findById(id: number): Promise<BoardGroupDto | null> {

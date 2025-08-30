@@ -3,6 +3,7 @@ import { PrismaService } from 'src/adapters/prisma/prisma.service';
 import { BoardDto } from './dto/board.dto';
 import { plainToInstance } from 'class-transformer';
 import { CreateBoardInput } from './dto/create-board.input';
+import { BoardGroupDto } from 'src/boardgroup/dto/board-group.dto';
 
 @Injectable()
 export class BoardService {
@@ -36,43 +37,6 @@ export class BoardService {
   }
 
   /**
-   * Get all boards in a specific board group
-   * @param id Board Group ID
-   * @returns Array of BoardDto
-   */
-  async findBoardsByBoardGroupId(id: number): Promise<BoardDto[]> {
-    const boards = await this.prisma.boardGroup
-      .findUnique({ where: { id: id } })
-      ?.boards({
-        where: {
-          deletedAt: null,
-        },
-      });
-
-    if (!boards) {
-      return [];
-    }
-
-    return plainToInstance(BoardDto, boards);
-  }
-
-  /**
-   * Test method - Get boards using regular findMany (not fluent API)
-   * @param id Board Group ID
-   * @returns Array of BoardDto
-   */
-  // async testNonFluentFindBoardsByBoardGroupId(id: number): Promise<BoardDto[]> {
-  //   const boards = await this.prisma.board.findMany({
-  //     where: {
-  //       boardGroupId: id,
-  //       deletedAt: null,
-  //     },
-  //   });
-
-  //   return plainToInstance(BoardDto, boards);
-  // }
-
-  /**
    * Create a new board
    * @param data Board creation input
    * @returns Created BoardDto
@@ -83,5 +47,13 @@ export class BoardService {
     });
 
     return plainToInstance(BoardDto, board);
+  }
+
+  async findByBoardId(id: number): Promise<BoardGroupDto | null> {
+    const boardGroup = await this.prisma.board
+      .findUnique({ where: { id } })
+      ?.boardGroup();
+
+    return boardGroup ? plainToInstance(BoardGroupDto, boardGroup) : null;
   }
 }
