@@ -9,8 +9,9 @@ import { BoardGroupModule } from './boardgroup/board-group.module';
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
-      autoSchemaFile: 'schema.gql', // nest가 자동으로 schema.gql 파일을 프로젝트 루트에 생성해 준다.
-      playground: true,
+      autoSchemaFile: 'schema.gql',
+      playground: process.env.NODE_ENV === 'production' || true,
+      introspection: process.env.NODE_ENV === 'production' || true,
     }),
     BoardModule,
     BoardGroupModule,
