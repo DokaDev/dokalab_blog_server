@@ -1,0 +1,76 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type BoardGroupDto {
+  """Board Group ID"""
+  id: Int!
+
+  """Board Group Title"""
+  title: String!
+
+  """List of boards in the group"""
+  boards: [BoardDto!]!
+}
+
+type BoardDto {
+  """Board ID"""
+  id: Int!
+
+  """Name of Board"""
+  title: String!
+
+  """Slug of Board(e.g. Development -> devel)"""
+  slug: String!
+
+  """When the Board was created."""
+  createdAt: DateTime!
+
+  """When the Board was deleted. Basic soft delete timestamp."""
+  deletedAt: DateTime
+
+  """The group to which the board belongs"""
+  boardGroup: BoardGroupDto
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Query {
+  """Get all boards"""
+  findAllBoards: [BoardDto!]!
+
+  """Get a board by ID"""
+  findBoardById(id: Int!): BoardDto
+
+  """Get all board groups"""
+  findAllBoardGroups: [BoardGroupDto!]!
+
+  """Get a board group by ID"""
+  findBoardGroupById(id: Int!): BoardGroupDto
+}
+
+type Mutation {
+  createBoard(data: CreateBoardInput!): BoardDto!
+
+  """Create a new board group"""
+  createBoardGroup(data: CreateBoardGroupInput!): BoardGroupDto!
+}
+
+input CreateBoardInput {
+  """Title of the board"""
+  title: String!
+
+  """Slug of the board (e.g. Development -> devel)"""
+  slug: String!
+
+  """Board group ID that this board belongs to"""
+  boardGroupId: Int!
+}
+
+input CreateBoardGroupInput {
+  """Title of the board group"""
+  title: String!
+}
