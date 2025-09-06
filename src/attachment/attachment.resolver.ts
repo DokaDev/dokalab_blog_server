@@ -27,4 +27,7 @@ export class AttachmentResolver {
     // 올바른 파일일 경우, READY로 상태 변경
     // TODO: attachment 객체 반환
   }
+
+  @Mutation()
+  async attachmentDelete() {}
 }

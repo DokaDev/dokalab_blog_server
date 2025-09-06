@@ -28,7 +28,7 @@ model Board {
   id Int @id @default(autoincrement())
 
   title String  @db.VarChar(120)
-  slug  String @unique  @db.VarChar(40) // B-tree 인덱스 자동생성
+  slug  String @unique  @db.VarChar(100) // B-tree 인덱스 자동생성
 
   description String?
 
@@ -60,6 +60,8 @@ model Post {
 
   readTime  Int?  @map("read_time") // minute 단위
 
+  attachments PostAttachment[]
+
   createdAt DateTime @default(now())  @map("created_at")
 
   publishedAt DateTime? @map("published_at")
@@ -67,9 +69,15 @@ model Post {
   deletedAt DateTime? @map("deleted_at")
 
   @@index([boardId])
-  @@index([title])
-  @@index([content])
+  @@index([status])           // 상태별 조회
+  @@index([publishedAt])      // 발행일순 정렬
+  @@index([boardId, status])  // 복합 인덱스 (게시판별 상태 조회)
+  @@index([boardId, publishedAt]) // 복합 인덱스 (게시판별 발행일 정렬)
+  @@index([title])            // 제목 검색용 (필요시)
+  // @@index([content])       // 내용 검색은 full-text 검색 고려
   @@index([postNumber])
+
+  @@unique([boardId, postNumber], name: "unique_post_number_per_board")
 
   @@map("post")
 }
@@ -92,9 +100,20 @@ model PostAttachment {
   mimeType String  @db.VarChar(128) @map("mime_type")
   size     Int // byte 단위
 
-  uploadedAt DateTime @default(now()) @map("uploaded_at")
+  postId   Int? @map("post_id")
+  post     Post?     @relation(fields: [postId], references: [id], onDelete: SetNull)
 
-  // @@index([])
+  isCommitted Boolean @default(false) @map("is_committed")
+
+  uploadedAt DateTime @default(now()) @map("uploaded_at")
+  committedAt DateTime? @map("committed_at")
+
+  @@index([postId])           // 게시글별 첨부파일 조회
+  @@index([isCommitted])      // 커밋 상태별 조회 (정리 작업용)
+  @@index([uploadState])      // 업로드 상태별 조회
+  @@index([uploadedAt])       // 시간순 정렬/정리 작업용
+  @@index([isCommitted, uploadedAt]) // 복합 인덱스 (정리 쿼리 최적화)
+  
   @@map("post_attachment")
 }
 

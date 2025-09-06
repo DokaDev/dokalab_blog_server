@@ -13,7 +13,9 @@ export class AttachmentService {
   // TODO: object Key Creation Method
   //   public createObjectKey(originalFilename: string)
 
-  // TODO: preSignedUrl Creation Method
+  async getPresignedUrl(key: string, type: string) {
+    return await this.s3.getPresignedUrl(key, type);
+  }
 
   // --
   // public async create(data: CreateAttachmentInput) {
