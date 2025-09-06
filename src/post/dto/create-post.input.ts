@@ -14,4 +14,7 @@ export class CreatePostInput {
   @Field(() => Int, { description: 'Board ID that the post belongs to' })
   @IsInt()
   boardId: number;
+
+  @Field(() => Boolean, { description: 'Is Draft or Not', defaultValue: false })
+  isDraft: boolean;
 }

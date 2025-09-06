@@ -17,15 +17,26 @@ type PostDto {
   """ID of the post"""
   id: Int!
 
+  """"""
+  postNumber: Int
+
   """Title of the post"""
   title: String!
 
   """Content of the post"""
   content: String!
-  readTime: Int!
+
+  """Read time in minutes"""
+  readTime: Int
 
   """Creation date of the post"""
   createdAt: DateTime!
+
+  """Status of the post"""
+  status: status!
+
+  """Last update date of the post"""
+  updatedAt: DateTime!
 
   """Deletion date of the post"""
   deletedAt: DateTime
@@ -38,6 +49,12 @@ type PostDto {
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
+
+enum status {
+  PUBLISHED
+  DRAFT
+  DELETED
+}
 
 type BoardDto {
   """Board ID"""
@@ -82,6 +99,8 @@ type Mutation {
   """Create a new board group"""
   createBoardGroup(data: CreateBoardGroupInput!): BoardGroupDto!
   createPost(input: CreatePostInput!): PostDto!
+  updatePost(input: UpdatePostInput!): PostDto!
+  deletePost(id: Int!): PostDto
 }
 
 input CreateBoardInput {
@@ -109,4 +128,14 @@ input CreatePostInput {
 
   """Board ID that the post belongs to"""
   boardId: Int!
+
+  """Is Draft or Not"""
+  isDraft: Boolean! = false
+}
+
+input UpdatePostInput {
+  id: Int!
+  title: String
+  content: String
+  isDraft: Boolean! = false
 }

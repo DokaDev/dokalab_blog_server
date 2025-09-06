@@ -48,9 +48,12 @@ model Board {
 
 model Post {
   id        Int      @id @default(autoincrement())
+  postNumber  Int? @map("post_number") // board 내에서의 고유번호, 1부터 시작
 
   title     String  @db.VarChar(256)
   content   String  @db.Text()
+
+  status    PostStatus @default(DRAFT)
 
   boardId   Int @map("board_id")
   board     Board       @relation(fields: [boardId], references: [id])
@@ -58,10 +61,48 @@ model Post {
   readTime  Int?  @map("read_time") // minute 단위
 
   createdAt DateTime @default(now())  @map("created_at")
+
+  publishedAt DateTime? @map("published_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
   @@index([boardId])
   @@index([title])
+  @@index([content])
+  @@index([postNumber])
 
   @@map("post")
 }
+
+enum PostStatus {
+  PUBLISHED
+  DRAFT
+  DELETED
+  @@map("post_status")
+}
+
+model PostAttachment {
+  id        Int      @id @default(autoincrement())
+
+  uploadState AttachmentUploadState @default(PENDING)
+
+  originalFilename  String  @db.VarChar(256) @map("original_filename")
+  key String @db.VarChar(512) // S3 key
+
+  mimeType String  @db.VarChar(128) @map("mime_type")
+  size     Int // byte 단위
+
+  uploadedAt DateTime @default(now()) @map("uploaded_at")
+
+  // @@index([])
+  @@map("post_attachment")
+}
+
+enum AttachmentUploadState {
+  PENDING
+  READY
+  @@map("attachment_upload_state")
+}
+
+
+

@@ -5,6 +5,8 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { BoardModule } from './board/board.module';
 import { BoardGroupModule } from './boardgroup/board-group.module';
 import { PostModule } from './post/post.module';
+import { AttachmentModule } from './attachment/attachment.module';
+import { S3Module } from './adapters/s3/s3.module';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { PostModule } from './post/post.module';
     BoardModule,
     BoardGroupModule,
     PostModule,
+    S3Module,
+    AttachmentModule,
   ],
   controllers: [],
   providers: [],

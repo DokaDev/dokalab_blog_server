@@ -13,6 +13,7 @@ import { PostService } from './post.service';
 import { PostDto } from './dto/post.dto';
 import { BoardDto } from 'src/board/dto/board.dto';
 import { CreatePostInput } from './dto/create-post.input';
+import { UpdatePostInput } from './dto/update-post.input';
 
 @Resolver(() => PostDto)
 export class PostResolver {
@@ -42,4 +43,20 @@ export class PostResolver {
   async createPost(@Args('input') input: CreatePostInput): Promise<PostDto> {
     return await this.postService.create(input);
   }
+
+  @Mutation(() => PostDto)
+  async updatePost(@Args('input') input: UpdatePostInput): Promise<PostDto> {
+    return await this.postService.update(input);
+  }
+
+  @Mutation(() => PostDto, { nullable: true })
+  async deletePost(@Args('id', { type: () => Int }) id: number) {
+    return await this.postService.delete(id);
+  }
+
+  // 데이터 완전소멸용 delete 추가
+  // @Mutation(() => PostDto, { nullable: true })
+  // async hardDeletePost(@Args('id', { type: () => Int }) id: number) {
+  //   return await this.postService.hardDelete(id);
+  // }
 }
