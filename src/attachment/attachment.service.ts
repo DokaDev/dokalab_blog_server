@@ -116,4 +116,37 @@ export class AttachmentService {
 
     return true;
   }
+
+  // -------
+  async cleanupPendingAttachments() {
+    const now = new Date();
+
+    await this.prisma.postAttachment.deleteMany({
+      where: {
+        uploadState: AttachmentUploadState.PENDING,
+        uploadExpiresAt: { lt: now },
+      },
+    });
+  }
+
+  async cleanupUncommittedAttachments() {
+    const now = new Date();
+
+    const uncommittedFiles = await this.prisma.postAttachment.findMany({
+      where: {
+        uploadState: AttachmentUploadState.READY,
+        commitExpiresAt: { lt: now },
+        committedAt: null,
+      },
+    });
+
+    for (const file of uncommittedFiles) {
+      const key = this.getObjectKey(plainToInstance(AttachmentDto, file));
+
+      await this.s3.deleteFile(key);
+      await this.prisma.postAttachment.delete({
+        where: { id: file.id },
+      });
+    }
+  }
 }

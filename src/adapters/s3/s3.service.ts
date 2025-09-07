@@ -1,4 +1,9 @@
-import { HeadObjectCommand, PutObjectCommand, S3 } from '@aws-sdk/client-s3';
+import {
+  DeleteObjectCommand,
+  HeadObjectCommand,
+  PutObjectCommand,
+  S3,
+} from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Injectable } from '@nestjs/common';
 
@@ -72,5 +77,20 @@ export class S3Service {
       }
     }
     return false;
+  }
+
+  async deleteFile(key: string): Promise<boolean> {
+    try {
+      const command = new DeleteObjectCommand({
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: key,
+      });
+
+      await this.s3.send(command);
+      return true;
+    } catch (error) {
+      console.error(`Error deleting file: ${key} - `, error);
+      return false;
+    }
   }
 }

@@ -12,16 +12,12 @@ export class AttachmentResolver {
   async attachmentPrepareUpload(@Args('data') data: CreateAttachmentInput) {
     const attachment = await this.attachmentService.create(data);
 
-    console.log('checkpoint 1');
-
     const key = this.attachmentService.getObjectKey(attachment);
 
-    console.log('checkpoint 2');
     const url = await this.attachmentService.getPresignedUrl(
       key,
       attachment.mimeType,
     );
-    console.log('checkpoint 3');
 
     return {
       attachment,
