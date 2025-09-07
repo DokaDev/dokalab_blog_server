@@ -59,10 +59,4 @@ export class PostResolver {
   async deletePost(@Args('id', { type: () => Int }) id: number) {
     return await this.postService.delete(id);
   }
-
-  // 데이터 완전소멸용 delete 추가
-  // @Mutation(() => PostDto, { nullable: true })
-  // async hardDeletePost(@Args('id', { type: () => Int }) id: number) {
-  //   return await this.postService.hardDelete(id);
-  // }
 }
