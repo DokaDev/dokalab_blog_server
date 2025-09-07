@@ -5,6 +5,7 @@ import {
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
+import { AttachmentDto } from 'src/attachment/dto/attachment.dto';
 import { BoardDto } from 'src/board/dto/board.dto';
 
 export enum PostStatus {
@@ -53,4 +54,7 @@ export class PostDto {
 
   @Field(() => BoardDto, { description: 'Board associated with the post' })
   board: BoardDto;
+
+  @Field(() => [AttachmentDto], { nullable: true, description: 'Attachments' })
+  attachments?: AttachmentDto[];
 }

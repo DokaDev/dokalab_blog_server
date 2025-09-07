@@ -7,6 +7,7 @@ import { CreatePostInput } from './dto/create-post.input';
 import { calculateReadingTime } from 'src/utils/readtime/readtime.util';
 import { UpdatePostInput } from './dto/update-post.input';
 import { GraphQLError } from 'graphql';
+import { AttachmentDto } from 'src/attachment/dto/attachment.dto';
 
 @Injectable()
 export class PostService {
@@ -113,14 +114,8 @@ export class PostService {
         extensions: { code: 'NOT_FOUND' },
       });
     }
-
-    const deletedPost = await this.prisma.post.update({
-      where: { id },
-      data: {
-        status: PostStatus.DELETED,
-        deletedAt: new Date(),
-      },
-    });
+    // hard delete
+    const deletedPost = await this.prisma.post.delete({ where: { id } });
 
     return plainToInstance(PostDto, deletedPost);
   }
@@ -129,6 +124,15 @@ export class PostService {
   async findBoardByPostId(id: number): Promise<BoardDto> {
     const board = await this.prisma.post.findUnique({ where: { id } })?.board();
     return plainToInstance(BoardDto, board);
+  }
+
+  async findAttachmentsByPostId(postId: number) {
+    const attachments = await this.prisma.post
+      .findUnique({
+        where: { id: postId },
+      })
+      ?.attachments();
+    return plainToInstance(AttachmentDto, attachments || []);
   }
 
   private async getNextPostNumber(): Promise<number> {

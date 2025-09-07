@@ -85,7 +85,6 @@ model Post {
 enum PostStatus {
   PUBLISHED
   DRAFT
-  DELETED
   @@map("post_status")
 }
 
@@ -95,7 +94,7 @@ model PostAttachment {
   uploadState AttachmentUploadState @default(PENDING)
 
   originalFilename  String  @db.VarChar(256) @map("original_filename")
-  key String @db.VarChar(512) // S3 key
+  // key String @db.VarChar(512) // S3 key
 
   mimeType String  @db.VarChar(128) @map("mime_type")
   size     Int // byte 단위
@@ -103,17 +102,20 @@ model PostAttachment {
   postId   Int? @map("post_id")
   post     Post?     @relation(fields: [postId], references: [id], onDelete: SetNull)
 
-  isCommitted Boolean @default(false) @map("is_committed")
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  uploadExpiresAt  DateTime @map("uploade_expires_at") // PENDING 상태에서 일정시간 후 자동삭제용
+  commitExpiresAt  DateTime? @map("commit_expires_at") // READY 상태에서 일정시간 후 자동삭제용(업로드는 완료되었으나 게시글에 첨부되지 않은 경우)
 
-  uploadedAt DateTime @default(now()) @map("uploaded_at")
   committedAt DateTime? @map("committed_at")
 
   @@index([postId])           // 게시글별 첨부파일 조회
-  @@index([isCommitted])      // 커밋 상태별 조회 (정리 작업용)
   @@index([uploadState])      // 업로드 상태별 조회
-  @@index([uploadedAt])       // 시간순 정렬/정리 작업용
-  @@index([isCommitted, uploadedAt]) // 복합 인덱스 (정리 쿼리 최적화)
-  
+  @@index([createdAt])       // 시간순 정렬/정리 작업용
+
+  @@index([uploadExpiresAt])  // 업로드 만료시간순 정렬/정리 작업용
+  @@index([commitExpiresAt])  // 커밋 만료시간순 정렬/정리 작업용
+
   @@map("post_attachment")
 }
 

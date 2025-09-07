@@ -14,6 +14,7 @@ import { PostDto } from './dto/post.dto';
 import { BoardDto } from 'src/board/dto/board.dto';
 import { CreatePostInput } from './dto/create-post.input';
 import { UpdatePostInput } from './dto/update-post.input';
+import { AttachmentDto } from 'src/attachment/dto/attachment.dto';
 
 @Resolver(() => PostDto)
 export class PostResolver {
@@ -22,6 +23,11 @@ export class PostResolver {
   @ResolveField(() => BoardDto)
   async board(@Parent() post: PostDto): Promise<BoardDto> {
     return await this.postService.findBoardByPostId(post.id);
+  }
+
+  @ResolveField(() => [AttachmentDto])
+  async attachments(@Parent() post: PostDto) {
+    return await this.postService.findAttachmentsByPostId(post.id);
   }
 
   // -------------------

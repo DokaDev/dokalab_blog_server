@@ -13,6 +13,29 @@ type BoardGroupDto {
   boards: [BoardDto!]!
 }
 
+type AttachmentDto {
+  id: Int!
+  uploadState: AttachmentUploadState!
+  postId: Int
+  originalFilename: String!
+  mimeType: String!
+  size: Int!
+  createdAt: DateTime!
+  uploadExpiresAt: DateTime!
+  commitExpiresAt: DateTime
+  committedAt: DateTime
+}
+
+enum AttachmentUploadState {
+  PENDING
+  READY
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type PostDto {
   """ID of the post"""
   id: Int!
@@ -43,12 +66,10 @@ type PostDto {
 
   """Board associated with the post"""
   board: BoardDto!
-}
 
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
+  """Attachments"""
+  attachments: [AttachmentDto!]
+}
 
 enum status {
   PUBLISHED
@@ -77,6 +98,11 @@ type BoardDto {
   posts: [PostDto!]!
 }
 
+type AttachmentPrepareUploadResponse {
+  attachment: AttachmentDto!
+  presignedUrl: String!
+}
+
 type Query {
   """Get all boards"""
   findAllBoards: [BoardDto!]!
@@ -101,6 +127,10 @@ type Mutation {
   createPost(input: CreatePostInput!): PostDto!
   updatePost(input: UpdatePostInput!): PostDto!
   deletePost(id: Int!): PostDto
+  attachmentPrepareUpload(data: CreateAttachmentInput!): AttachmentPrepareUploadResponse!
+  attachmentCompleteUpload(attachmentId: Int!): AttachmentDto
+  deleteAttachment(attachmentId: Int!): AttachmentDto!
+  commitAttachments(postId: Int!, attachmentIds: [Int!]!): [AttachmentDto!]!
 }
 
 input CreateBoardInput {
@@ -138,4 +168,10 @@ input UpdatePostInput {
   title: String
   content: String
   isDraft: Boolean! = false
+}
+
+input CreateAttachmentInput {
+  originalFileName: String!
+  size: Int!
+  mimeType: String!
 }
