@@ -2,11 +2,16 @@ import { NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module';
 
-import { PORT } from './config/config';
+import { TypedConfigService } from './config/config.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(PORT);
-  console.log(`🚀 Server ready at http://localhost:${PORT}/graphql`);
+
+  const configService = app.get(TypedConfigService);
+
+  await app.listen(configService.get('PORT'));
+  console.log(
+    `🚀 Server ready at http://localhost:${configService.get('PORT')}/graphql`,
+  );
 }
 bootstrap();

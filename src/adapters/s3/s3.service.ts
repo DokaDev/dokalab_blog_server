@@ -6,20 +6,29 @@ import {
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Injectable } from '@nestjs/common';
+import { TypedConfigService } from 'src/config/config.service';
 
 @Injectable()
 export class S3Service {
   private readonly s3: S3;
   private readonly PRESIGNED_URL_EXPIRATION = 60 * 15; // 15 minutes
 
-  constructor() {
+  private readonly MINIO_ROOT_USER: string;
+  private readonly MINIO_ROOT_PASSWORD: string;
+  private readonly S3_BUCKET_NAME: string;
+  private readonly S3_ENDPOINT: string;
+
+  constructor(private readonly configService: TypedConfigService) {
     this.s3 = new S3({
-      endpoint: process.env.S3_ENDPOINT,
+      endpoint: (this.S3_ENDPOINT = this.configService.get('S3_ENDPOINT')),
       region: 'us-east-1',
       forcePathStyle: true,
       credentials: {
-        accessKeyId: process.env.MINIO_ROOT_USER!,
-        secretAccessKey: process.env.MINIO_ROOT_PASSWORD!,
+        accessKeyId: (this.MINIO_ROOT_USER =
+          this.configService.get('MINIO_ROOT_USER')),
+        secretAccessKey: (this.MINIO_ROOT_PASSWORD = this.configService.get(
+          'MINIO_ROOT_PASSWORD',
+        )),
       },
     });
   }
@@ -39,7 +48,7 @@ export class S3Service {
     return presignedUrl;
   }
 
-  // 버킷이 존재하는가?
+  // 버킷이 존재하는가?q
   async isBucketAvailable() {
     // S3 버킷이 유효한지 확인하는 로직 구현 (예: 버킷 존재 여부 확인)
     try {

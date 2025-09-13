@@ -7,9 +7,11 @@ import { BoardGroupModule } from './boardgroup/board-group.module';
 import { PostModule } from './post/post.module';
 import { AttachmentModule } from './attachment/attachment.module';
 import { S3Module } from './adapters/s3/s3.module';
+import { TypedConfigModule } from './config/config.service';
 
 @Module({
   imports: [
+    TypedConfigModule.forRoot({ isGlobal: true, cache: true }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: 'schema.gql',

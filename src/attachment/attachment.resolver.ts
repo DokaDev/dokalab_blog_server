@@ -11,7 +11,6 @@ export class AttachmentResolver {
   @Mutation(() => AttachmentPrepareUploadResponse)
   async attachmentPrepareUpload(@Args('data') data: CreateAttachmentInput) {
     const attachment = await this.attachmentService.create(data);
-
     const key = this.attachmentService.getObjectKey(attachment);
 
     const url = await this.attachmentService.getPresignedUrl(
