@@ -104,7 +104,7 @@ model PostAttachment {
 
   createdAt DateTime @default(now()) @map("created_at")
   
-  uploadExpiresAt  DateTime @map("uploade_expires_at") // PENDING 상태에서 일정시간 후 자동삭제용
+  uploadExpiresAt  DateTime @map("upload_expires_at") // PENDING 상태에서 일정시간 후 자동삭제용
   commitExpiresAt  DateTime? @map("commit_expires_at") // READY 상태에서 일정시간 후 자동삭제용(업로드는 완료되었으나 게시글에 첨부되지 않은 경우)
 
   committedAt DateTime? @map("committed_at")

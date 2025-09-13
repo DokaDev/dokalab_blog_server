@@ -10,8 +10,8 @@ export const { TypedConfigService, TypedConfigModule } = createTypedConfig({
   REDIS_PORT: Joi.number().default(6379),
   S3_ENDPOINT: Joi.string().default('http://localhost:9000'),
   S3_BUCKET_NAME: Joi.string().default('blog.dokalab.uk'),
-  MINIO_ROOT_USER: Joi.string().default('minioadmin'),
-  MINIO_ROOT_PASSWORD: Joi.string().default('minioadmin'),
+  MINIO_ROOT_USER: Joi.string().default('s3admin'),
+  MINIO_ROOT_PASSWORD: Joi.string().default('s3admin'),
 });
 
 export type TypedConfigService = InstanceType<typeof TypedConfigService>;
