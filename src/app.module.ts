@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
@@ -8,6 +8,10 @@ import { PostModule } from './post/post.module';
 import { AttachmentModule } from './attachment/attachment.module';
 import { S3Module } from './adapters/s3/s3.module';
 import { TypedConfigModule } from './config/config.service';
+import { ContextMiddleware } from './auth/context.middleware';
+import { AdminGuard } from './auth/guard/admin.guard';
+import { LoginGuard } from './auth/guard/login.guard';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -17,6 +21,7 @@ import { TypedConfigModule } from './config/config.service';
       autoSchemaFile: 'schema.gql',
       playground: process.env.NODE_ENV === 'production' || true,
       introspection: process.env.NODE_ENV === 'production' || true,
+      context: ({ req }) => req.context,
     }),
     BoardModule,
     BoardGroupModule,
@@ -25,6 +30,19 @@ import { TypedConfigModule } from './config/config.service';
     AttachmentModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: LoginGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AdminGuard,
+    },
+  ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(ContextMiddleware).forRoutes('*');
+  }
+}

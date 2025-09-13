@@ -1,17 +1,20 @@
 import {
-  Query,
-  Resolver,
   Args,
+  Context,
   Int,
-  ResolveField,
-  Parent,
   Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
 } from '@nestjs/graphql';
 
+import { RequestContext } from 'src/auth/request-context';
+import { BoardDto } from 'src/board/dto/board.dto';
 import { BoardGroupService } from './board-group.service';
 import { BoardGroupDto } from './dto/board-group.dto';
-import { BoardDto } from 'src/board/dto/board.dto';
 import { CreateBoardGroupInput } from './dto/create-board-group.input';
+import { AdminRequired } from 'src/auth/decorators/admin-required.decorator';
 
 @Resolver(() => BoardGroupDto)
 export class BoardGroupResolver {
@@ -26,8 +29,13 @@ export class BoardGroupResolver {
 
   // -------------------
 
+  @AdminRequired()
   @Query(() => [BoardGroupDto], { description: 'Get all board groups' })
-  async findAllBoardGroups(): Promise<BoardGroupDto[]> {
+  async findAllBoardGroups(
+    @Context() context: RequestContext,
+  ): Promise<BoardGroupDto[]> {
+    console.log('context - currentUser', context.currentUser);
+
     return await this.boardGroupService.findAll();
   }
 
