@@ -5,6 +5,10 @@ import { PrismaService } from 'src/adapters/prisma/prisma.service';
 import { AttachmentDto } from './dto/attachment.dto';
 import { plainToInstance } from 'class-transformer';
 import { AttachmentUploadState } from '@prisma/client';
+import {
+  ONE_DAY_IN_MS,
+  ONE_HOUR_IN_MS,
+} from 'src/common/constants/time.constant';
 
 @Injectable()
 export class AttachmentService {
@@ -31,36 +35,24 @@ export class AttachmentService {
         originalFilename: originalFileName,
         size,
         mimeType,
-        uploadExpiresAt: new Date(Date.now() + 3 * 60 * 60 * 1000),
+        uploadExpiresAt: new Date(Date.now() + 3 * ONE_HOUR_IN_MS), // 3 hours
       },
     });
 
     return plainToInstance(AttachmentDto, attachment);
   }
 
-  async updateAttachmentToPendingCommit(attachmentId) {
+  async updateAttachmentToPendingCommit(attachmentId: number) {
     return await this.prisma.postAttachment.update({
       where: { id: attachmentId },
       data: {
         uploadState: AttachmentUploadState.READY,
-        commitExpiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        commitExpiresAt: new Date(Date.now() + 7 * ONE_DAY_IN_MS), // 7 days
       },
     });
   }
 
   async commitAttachments(postId: number, attachmentIds: number[]) {
-    // postId, attachmentIds 배열을 받아서 해당 attachment들의 committedAt과 postId를 업데이트
-    // const updatedAttachments = await this.prisma.$transaction(
-    //   attachmentIds.map((id) =>
-    //     this.prisma.postAttachment.update({
-    //       where: { id },
-    //       data: {
-    //         postId,
-    //         committedAt: new Date(),
-    //       },
-    //     }),
-    //   ),
-    // );
     // updateMany 사용
     const updatedAttachments = await this.prisma.postAttachment.updateMany({
       where: {
@@ -82,13 +74,32 @@ export class AttachmentService {
     return plainToInstance(AttachmentDto, updatedAttachmentRecords);
   }
 
+  /**
+   * attachment는 soft delete 없이 실제 삭제 처리
+   * S3에서도 파일 삭제
+   * @param attachmentId
+   * @returns
+   */
   async delete(attachmentId: number): Promise<AttachmentDto> {
-    return plainToInstance(
-      AttachmentDto,
-      await this.prisma.postAttachment.delete({
-        where: { id: attachmentId },
-      }),
-    );
+    // s3에서 먼저 삭제 -> 실제로 삭제되었는지 확인 후 -> db에서 삭제
+    const attachment = await this.findById(attachmentId);
+    if (!attachment) {
+      throw new Error('Attachment not found');
+    }
+
+    const key = this.getObjectKey(attachment);
+    await this.s3.deleteFile(key);
+
+    const isFileRemaining = await this.s3.isAvailableFile(key);
+    if (isFileRemaining) {
+      throw new Error('Failed to delete file from S3');
+    }
+
+    await this.prisma.postAttachment.delete({
+      where: { id: attachmentId },
+    });
+
+    return attachment;
   }
 
   // ------
