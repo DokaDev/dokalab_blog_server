@@ -12,6 +12,8 @@ import { ContextMiddleware } from './auth/context.middleware';
 import { AdminGuard } from './auth/guard/admin.guard';
 import { LoginGuard } from './auth/guard/login.guard';
 import { APP_GUARD } from '@nestjs/core';
+import { RedisModule } from './adapters/redis/redis.module';
+import { CacheModule } from './cache/cache.module';
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import { APP_GUARD } from '@nestjs/core';
       introspection: process.env.NODE_ENV === 'production' || true,
       context: ({ req }) => req.context,
     }),
+    RedisModule,
+    CacheModule,
     BoardModule,
     BoardGroupModule,
     PostModule,

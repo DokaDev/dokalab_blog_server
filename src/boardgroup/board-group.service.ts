@@ -44,4 +44,11 @@ export class BoardGroupService {
 
     return plainToInstance(BoardGroupDto, boardGroup);
   }
+
+  async delete(id: number): Promise<BoardGroupDto | null> {
+    const deletedBoardGroup = await this.prisma.boardGroup.delete({
+      where: { id },
+    });
+    return plainToInstance(BoardGroupDto, deletedBoardGroup);
+  }
 }

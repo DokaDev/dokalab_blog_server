@@ -124,6 +124,9 @@ type Mutation {
 
   """Create a new board group"""
   createBoardGroup(data: CreateBoardGroupInput!): BoardGroupDto!
+
+  """Delete a board group by ID"""
+  deleteBoardGroup(id: Int!): BoardGroupDto
   createPost(input: CreatePostInput!): PostDto!
   updatePost(input: UpdatePostInput!): PostDto!
   deletePost(id: Int!): PostDto

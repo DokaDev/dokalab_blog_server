@@ -29,7 +29,6 @@ export class BoardGroupResolver {
 
   // -------------------
 
-  @AdminRequired()
   @Query(() => [BoardGroupDto], { description: 'Get all board groups' })
   async findAllBoardGroups(
     @Context() context: RequestContext,
@@ -53,9 +52,21 @@ export class BoardGroupResolver {
   @Mutation(() => BoardGroupDto, {
     description: 'Create a new board group',
   })
+  @AdminRequired()
   async createBoardGroup(
     @Args('data') data: CreateBoardGroupInput,
   ): Promise<BoardGroupDto> {
     return await this.boardGroupService.create(data);
+  }
+
+  @Mutation(() => BoardGroupDto, {
+    description: 'Delete a board group by ID',
+    nullable: true,
+  })
+  @AdminRequired()
+  async deleteBoardGroup(
+    @Args('id', { type: () => Int }) id: number,
+  ): Promise<BoardGroupDto | null> {
+    return await this.boardGroupService.delete(id);
   }
 }
