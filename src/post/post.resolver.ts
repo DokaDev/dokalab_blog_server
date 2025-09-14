@@ -69,13 +69,41 @@ export class PostResolver {
   @Mutation(() => PostDto)
   @AdminRequired()
   async createPost(@Args('input') input: CreatePostInput): Promise<PostDto> {
-    return await this.postService.create(input);
+    const newPost = await this.postService.create(input);
+
+    // create cache
+    const key: string = `post:${newPost.id}`;
+    await this.cacheService.setCache<PostDto>(
+      key,
+      newPost,
+      ONE_MINUTE_IN_S * 10,
+    ); // 10 minutes
+
+    return newPost;
   }
 
   @Mutation(() => PostDto)
   @AdminRequired()
   async updatePost(@Args('input') input: UpdatePostInput): Promise<PostDto> {
-    return await this.postService.update(input);
+    const post = await this.postService.findById(input.id);
+    if (!post) {
+      throw new Error('Post not found');
+    }
+
+    // Invalidate cache
+    const key: string = `post:${input.id}`;
+    await this.cacheService.deleteCache(key);
+
+    const updatedPost = await this.postService.update(input);
+
+    // refresh cache
+    await this.cacheService.setCache<PostDto>(
+      key,
+      updatedPost,
+      ONE_MINUTE_IN_S * 10,
+    ); // 10 minutes
+
+    return updatedPost;
   }
 
   @Mutation(() => PostDto, { nullable: true })
