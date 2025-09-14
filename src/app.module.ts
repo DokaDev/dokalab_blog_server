@@ -21,8 +21,8 @@ import { CacheModule } from './cache/cache.module';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: 'schema.gql',
-      playground: process.env.NODE_ENV === 'production' || true,
-      introspection: process.env.NODE_ENV === 'production' || true,
+      playground: process.env.NODE_ENV !== 'production',
+      introspection: process.env.NODE_ENV !== 'production',
       context: ({ req }) => req.context,
     }),
     RedisModule,

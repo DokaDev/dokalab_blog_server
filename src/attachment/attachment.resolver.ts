@@ -1,8 +1,8 @@
-import { Args, Int, Mutation, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, Int, Mutation, Resolver } from '@nestjs/graphql';
 import { AttachmentService } from './attachment.service';
+import { AttachmentPrepareUploadResponse } from './dto/attachment-prepare-uploade.response';
 import { AttachmentDto, AttachmentUploadState } from './dto/attachment.dto';
 import { CreateAttachmentInput } from './dto/create-attachment.input';
-import { AttachmentPrepareUploadResponse } from './dto/attachment-prepare-uploade.response';
 
 @Resolver(() => AttachmentDto)
 export class AttachmentResolver {

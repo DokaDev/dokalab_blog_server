@@ -10,14 +10,14 @@ import {
 
 import { PostService } from './post.service';
 
-import { RedisService } from 'src/adapters/redis/redis.service';
 import { AttachmentDto } from 'src/attachment/dto/attachment.dto';
 import { AdminRequired } from 'src/auth/decorators/admin-required.decorator';
 import { BoardDto } from 'src/board/dto/board.dto';
+import { CacheService } from 'src/cache/cache.service';
+import { ONE_MINUTE_IN_S } from 'src/common/constants/time.constant';
 import { CreatePostInput } from './dto/create-post.input';
 import { PostDto } from './dto/post.dto';
 import { UpdatePostInput } from './dto/update-post.input';
-import { CacheService } from 'src/cache/cache.service';
 
 @Resolver(() => PostDto)
 export class PostResolver {
@@ -55,7 +55,11 @@ export class PostResolver {
     } else {
       const postFromDb = await this.postService.findById(id);
       if (postFromDb) {
-        await this.cacheService.setCache<PostDto>(key, postFromDb, 60 * 10); // 10 minutes
+        await this.cacheService.setCache<PostDto>(
+          key,
+          postFromDb,
+          ONE_MINUTE_IN_S * 10,
+        ); // 10 minutes
       }
       return postFromDb;
     }
