@@ -81,6 +81,15 @@ export class PostResolver {
   @Mutation(() => PostDto, { nullable: true })
   @AdminRequired()
   async deletePost(@Args('id', { type: () => Int }) id: number) {
+    const post = await this.postService.findById(id);
+    if (!post) {
+      throw new Error('Post not found');
+    }
+
+    // Invalidate cache
+    const key: string = `post:${id}`;
+    await this.cacheService.deleteCache(key);
+
     return await this.postService.delete(id);
   }
 }

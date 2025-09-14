@@ -19,7 +19,7 @@ export class ContextMiddleware implements NestMiddleware {
         user = {
           id: 1,
           nickname: 'doka',
-          isAdmin: false, // adminrequired 데코레이터
+          isAdmin: true, // adminrequired 데코레이터
 
           userInput: auth,
         };

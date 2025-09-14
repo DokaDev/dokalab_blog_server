@@ -108,12 +108,6 @@ export class PostService {
   }
 
   async delete(id: number): Promise<PostDto> {
-    const existingPost = await this.findById(id);
-    if (!existingPost) {
-      throw new GraphQLError('Post not found', {
-        extensions: { code: 'NOT_FOUND' },
-      });
-    }
     // hard delete
     const deletedPost = await this.prisma.post.delete({ where: { id } });
 
