@@ -16,6 +16,8 @@ RUN npx prisma generate
 COPY . .
 
 # Build the application
+# install nestjs
+RUN npm install -g @nestjs/cli
 RUN npm run build
 
 # Run prisma migrate deploy and start production server
