@@ -12,6 +12,9 @@ export const { TypedConfigService, TypedConfigModule } = createTypedConfig({
   S3_BUCKET_NAME: Joi.string().default('blog.dokalab.uk'),
   MINIO_ROOT_USER: Joi.string().default('s3admin'),
   MINIO_ROOT_PASSWORD: Joi.string().default('s3admin'),
+  JWT_SECRET: Joi.string()
+    .min(32)
+    .default('your_jwt_secret_key_here_at_least_32_characters_long_dev'),
 });
 
 export type TypedConfigService = InstanceType<typeof TypedConfigService>;

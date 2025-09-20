@@ -1,19 +1,20 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 
-import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { APP_GUARD } from '@nestjs/core';
+import { GraphQLModule } from '@nestjs/graphql';
+import { RedisModule } from './adapters/redis/redis.module';
+import { S3Module } from './adapters/s3/s3.module';
+import { AttachmentModule } from './attachment/attachment.module';
+import { ContextMiddleware } from './auth/context/context.middleware';
+import { AdminGuard } from './auth/context/guard/admin.guard';
+import { LoginGuard } from './auth/context/guard/login.guard';
 import { BoardModule } from './board/board.module';
 import { BoardGroupModule } from './boardgroup/board-group.module';
-import { PostModule } from './post/post.module';
-import { AttachmentModule } from './attachment/attachment.module';
-import { S3Module } from './adapters/s3/s3.module';
-import { TypedConfigModule } from './config/config.service';
-import { ContextMiddleware } from './auth/context.middleware';
-import { AdminGuard } from './auth/guard/admin.guard';
-import { LoginGuard } from './auth/guard/login.guard';
-import { APP_GUARD } from '@nestjs/core';
-import { RedisModule } from './adapters/redis/redis.module';
 import { CacheModule } from './cache/cache.module';
+import { TypedConfigModule } from './config/config.service';
+import { PostModule } from './post/post.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { CacheModule } from './cache/cache.module';
     PostModule,
     S3Module,
     AttachmentModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [

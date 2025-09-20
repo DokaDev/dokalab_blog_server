@@ -2,17 +2,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type BoardGroupDto {
-  """Board Group ID"""
-  id: Int!
-
-  """Board Group Title"""
-  title: String!
-
-  """List of boards in the group"""
-  boards: [BoardDto!]!
-}
-
 type AttachmentDto {
   id: Int!
   uploadState: AttachmentUploadState!
@@ -35,6 +24,22 @@ enum AttachmentUploadState {
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
+
+type AttachmentPrepareUploadResponse {
+  attachment: AttachmentDto!
+  presignedUrl: String!
+}
+
+type BoardGroupDto {
+  """Board Group ID"""
+  id: Int!
+
+  """Board Group Title"""
+  title: String!
+
+  """List of boards in the group"""
+  boards: [BoardDto!]!
+}
 
 type PostDto {
   """ID of the post"""
@@ -98,9 +103,11 @@ type BoardDto {
   posts: [PostDto!]!
 }
 
-type AttachmentPrepareUploadResponse {
-  attachment: AttachmentDto!
-  presignedUrl: String!
+type CurrentUserDto {
+  id: Float!
+  nickname: String!
+  isAdmin: Boolean!
+  userInput: String
 }
 
 type Query {
@@ -115,6 +122,7 @@ type Query {
 
   """Get a board group by ID"""
   findBoardGroupById(id: Int!): BoardGroupDto
+  authTest: CurrentUserDto
   findAllPosts: [PostDto!]!
   findPostById(id: Int!): PostDto
 }

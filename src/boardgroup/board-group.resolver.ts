@@ -9,12 +9,12 @@ import {
   Resolver,
 } from '@nestjs/graphql';
 
-import { RequestContext } from 'src/auth/request-context';
+import { RequestContext } from 'src/auth/context/request-context';
 import { BoardDto } from 'src/board/dto/board.dto';
 import { BoardGroupService } from './board-group.service';
 import { BoardGroupDto } from './dto/board-group.dto';
 import { CreateBoardGroupInput } from './dto/create-board-group.input';
-import { AdminRequired } from 'src/auth/decorators/admin-required.decorator';
+import { AdminRequired } from 'src/auth/context/decorators/admin-required.decorator';
 
 @Resolver(() => BoardGroupDto)
 export class BoardGroupResolver {

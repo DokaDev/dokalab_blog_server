@@ -1,8 +1,8 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
-import { CurrentUserDto } from '../auth/dto/current-user.dto';
-import { RequestContext } from './request-context';
 import { AuthService } from 'src/auth/auth.service';
+import { CurrentUserDto } from './dto/current-user.dto';
+import { RequestContext } from './request-context';
 
 @Injectable()
 export class ContextMiddleware implements NestMiddleware {
@@ -15,6 +15,7 @@ export class ContextMiddleware implements NestMiddleware {
     if (auth?.startsWith('Bearer ')) {
       try {
         const token = auth.substring(7); // 'Bearer ' 제거
+
         user = await this.authService.verifyTokenAndCreateUserContext(token);
       } catch {
         user = null;

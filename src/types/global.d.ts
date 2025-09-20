@@ -1,4 +1,4 @@
-import { RequestContext } from '../auth/request-context';
+import { RequestContext } from '../auth/context/request-context';
 
 declare global {
   namespace Express {
