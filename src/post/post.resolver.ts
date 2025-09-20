@@ -108,7 +108,9 @@ export class PostResolver {
 
   @Mutation(() => PostDto, { nullable: true })
   @AdminRequired()
-  async deletePost(@Args('id', { type: () => Int }) id: number) {
+  async deletePost(
+    @Args('id', { type: () => Int }) id: number,
+  ): Promise<PostDto | null> {
     const post = await this.postService.findById(id);
     if (!post) {
       throw new Error('Post not found');
