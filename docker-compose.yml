@@ -7,6 +7,7 @@ services:
       - "3005:3000"
     networks:
       - dokalab_blog_network
+      - dokalab_personal_web_network
     env_file:
       - .env
     restart: unless-stopped
@@ -19,4 +20,6 @@ services:
 
 networks:
   dokalab_blog_network:
+    external: true
+  dokalab_personal_web_network:
     external: true
