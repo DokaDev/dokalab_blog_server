@@ -1,6 +1,5 @@
 import {
   Args,
-  Context,
   Int,
   Mutation,
   Parent,
@@ -13,8 +12,6 @@ import { PostService } from './post.service';
 
 import { AttachmentDto } from 'src/attachment/dto/attachment.dto';
 import { AdminRequired } from 'src/auth/context/decorators/admin-required.decorator';
-import { CurrentUserDto } from 'src/auth/context/dto/current-user.dto';
-import { RequestContext } from 'src/auth/context/request-context';
 import { BoardDto } from 'src/board/dto/board.dto';
 import { CacheService } from 'src/cache/cache.service';
 import { ONE_MINUTE_IN_S } from 'src/common/constants/time.constant';

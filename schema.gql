@@ -103,13 +103,6 @@ type BoardDto {
   posts: [PostDto!]!
 }
 
-type CurrentUserDto {
-  id: Float!
-  nickname: String!
-  isAdmin: Boolean!
-  userInput: String
-}
-
 type Query {
   """Get all boards"""
   findAllBoards: [BoardDto!]!
@@ -122,7 +115,6 @@ type Query {
 
   """Get a board group by ID"""
   findBoardGroupById(id: Int!): BoardGroupDto
-  authTest: CurrentUserDto
   findAllPosts: [PostDto!]!
   findPostById(id: Int!): PostDto
 }
