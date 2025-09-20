@@ -39,7 +39,7 @@ export class PostResolver {
     return await this.postService.findAttachmentsByPostId(post.id);
   }
 
-  // ------------------- 
+  // -------------------
 
   @Query(() => [PostDto])
   async findAllPosts(): Promise<PostDto[]> {
