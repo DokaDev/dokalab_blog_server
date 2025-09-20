@@ -16,7 +16,7 @@ RUN npx prisma generate
 COPY . .
 
 # Build the application
-RUN npm ci
+RUN npm run build
 
 # Run prisma migrate deploy and start production server
 CMD npx prisma migrate deploy && npm run start:prod
