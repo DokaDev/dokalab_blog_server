@@ -14,6 +14,7 @@ import { BoardDto } from './dto/board.dto';
 import { BoardGroupDto } from 'src/boardgroup/dto/board-group.dto';
 import { CreateBoardInput } from './dto/create-board.input';
 import { PostDto } from 'src/post/dto/post.dto';
+import { AdminRequired } from 'src/auth/context/decorators/admin-required.decorator';
 
 @Resolver(() => BoardDto)
 export class BoardResolver {
@@ -47,6 +48,7 @@ export class BoardResolver {
   }
 
   // --------------------
+  @AdminRequired()
   @Mutation(() => BoardDto)
   async createBoard(@Args('data') data: CreateBoardInput): Promise<BoardDto> {
     return await this.boardService.create(data);
