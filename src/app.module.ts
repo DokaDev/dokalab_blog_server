@@ -27,15 +27,15 @@ import { ApolloServerPluginSchemaReporting } from '@apollo/server/plugin/schemaR
       playground: process.env.NODE_ENV !== 'production',
       introspection: process.env.NODE_ENV !== 'production',
 
-      plugins: process.env.APOLLO_KEY
-        ? [
-            ApolloServerPluginUsageReporting({
-              sendVariableValues: { all: true },
-              sendHeaders: { all: true },
-            }),
-            ApolloServerPluginSchemaReporting(),
-          ]
-        : [],
+      // plugins: process.env.APOLLO_KEY
+      //   ? [
+      //       ApolloServerPluginUsageReporting({
+      //         sendVariableValues: { all: true },
+      //         sendHeaders: { all: true },
+      //       }),
+      //       ApolloServerPluginSchemaReporting(),
+      //     ]
+      //   : [],
 
       context: ({ req }) => req.context,
     }),
