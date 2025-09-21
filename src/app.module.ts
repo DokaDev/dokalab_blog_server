@@ -15,6 +15,8 @@ import { CacheModule } from './cache/cache.module';
 import { TypedConfigModule } from './config/config.service';
 import { PostModule } from './post/post.module';
 import { AuthModule } from './auth/auth.module';
+import { ApolloServerPluginUsageReporting } from '@apollo/server/plugin/usageReporting';
+import { ApolloServerPluginSchemaReporting } from '@apollo/server/plugin/schemaReporting';
 
 @Module({
   imports: [
@@ -24,6 +26,17 @@ import { AuthModule } from './auth/auth.module';
       autoSchemaFile: 'schema.gql',
       playground: process.env.NODE_ENV !== 'production',
       introspection: process.env.NODE_ENV !== 'production',
+
+      plugins: process.env.APOLLO_KEY
+        ? [
+            ApolloServerPluginUsageReporting({
+              sendVariableValues: { all: true },
+              sendHeaders: { all: true },
+            }),
+            ApolloServerPluginSchemaReporting(),
+          ]
+        : [],
+
       context: ({ req }) => req.context,
     }),
     RedisModule,
