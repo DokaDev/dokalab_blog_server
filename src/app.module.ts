@@ -15,6 +15,7 @@ import { BoardGroupModule } from './boardgroup/board-group.module';
 import { CacheModule } from './cache/cache.module';
 import { TypedConfigModule } from './config/config.service';
 import { PostModule } from './post/post.module';
+import { TagModule } from './tag/tag.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { PostModule } from './post/post.module';
     S3Module,
     AttachmentModule,
     AuthModule,
+    TagModule,
   ],
   controllers: [],
   providers: [

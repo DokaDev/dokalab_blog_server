@@ -103,6 +103,12 @@ type BoardDto {
   posts: [PostDto!]!
 }
 
+type TagDto {
+  id: Int!
+  name: String!
+  createdAt: DateTime!
+}
+
 type Query {
   """Get all boards"""
   findAllBoards: [BoardDto!]!
@@ -134,6 +140,7 @@ type Mutation {
   attachmentCompleteUpload(attachmentId: Int!): AttachmentDto
   deleteAttachment(attachmentId: Int!): AttachmentDto!
   commitAttachments(postId: Int!, attachmentIds: [Int!]!): [AttachmentDto!]!
+  createTag(input: CreateTagInputDto!): TagDto!
 }
 
 input CreateBoardInput {
@@ -177,4 +184,8 @@ input CreateAttachmentInput {
   originalFileName: String!
   size: Int!
   mimeType: String!
+}
+
+input CreateTagInputDto {
+  name: String!
 }
