@@ -99,6 +99,8 @@ model PostTag {
 
   createdAt DateTime @default(now()) @map("created_at")
 
+  deletedAt DateTime? @map("deleted_at")
+
   @@index([name])      // 태그명 자동완성/검색용 (LIKE 'prefix%')
   @@index([createdAt]) // 최신 태그 조회용
 

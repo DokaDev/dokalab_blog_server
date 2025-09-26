@@ -10,4 +10,7 @@ export class TagDto {
 
   @Field(() => GraphQLISODateTime)
   createdAt: Date;
+
+  @Field(() => GraphQLISODateTime, { nullable: true })
+  deletedAt?: Date | null;
 }
