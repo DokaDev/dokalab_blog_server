@@ -68,14 +68,17 @@ model Post {
   updatedAt   DateTime @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
+  postTagRelations PostTagRelation[]
+
   @@index([boardId])
   @@index([status])           // 상태별 조회
   @@index([publishedAt])      // 발행일순 정렬
   @@index([boardId, status])  // 복합 인덱스 (게시판별 상태 조회)
   @@index([boardId, publishedAt]) // 복합 인덱스 (게시판별 발행일 정렬)
-  @@index([title])            // 제목 검색용 (필요시)
+  // @@index([title])         // LIKE 검색용 - 필요시 활성화
   // @@index([content])       // 내용 검색은 full-text 검색 고려
-  @@index([postNumber])
+  @@index([createdAt])         // 최신순 정렬용
+
 
   @@unique([boardId, postNumber], name: "unique_post_number_per_board")
 
@@ -86,6 +89,35 @@ enum PostStatus {
   PUBLISHED
   DRAFT
   @@map("post_status")
+}
+
+model PostTag {
+  id    Int    @id @default(autoincrement())
+  name  String  @db.VarChar(50) @unique
+
+  postTagRelations PostTagRelation[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([name])      // 태그명 자동완성/검색용 (LIKE 'prefix%')
+  @@index([createdAt]) // 최신 태그 조회용
+
+  @@map("post_tag")
+}
+
+model PostTagRelation {
+  postId Int @map("post_id")
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  tagId  Int @map("tag_id")
+  tag    PostTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
+
+  @@index([tagId])   // 태그별 게시글 조회용
+  @@index([postId])  // 게시글별 태그 조회용
+
+  @@map("post_tag_relation")
 }
 
 model PostAttachment {
@@ -124,6 +156,3 @@ enum AttachmentUploadState {
   READY
   @@map("attachment_upload_state")
 }
-
-
-
