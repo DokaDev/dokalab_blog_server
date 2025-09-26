@@ -5,7 +5,12 @@ import { AppModule } from './app.module';
 import { TypedConfigService } from './config/config.service';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    cors: {
+      origin: true,
+      credentials: true,
+    },
+  });
 
   const configService = app.get(TypedConfigService);
 
