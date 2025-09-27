@@ -53,4 +53,12 @@ export class BoardResolver {
   async createBoard(@Args('data') data: CreateBoardInput): Promise<BoardDto> {
     return await this.boardService.create(data);
   }
+
+  @AdminRequired()
+  @Mutation(() => BoardDto, { nullable: true })
+  async deleteBoard(
+    @Args('id', { type: () => Int }) id: number,
+  ): Promise<BoardDto | null> {
+    return await this.boardService.delete(id);
+  }
 }

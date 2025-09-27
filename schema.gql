@@ -141,6 +141,7 @@ type Query {
 
 type Mutation {
   createBoard(data: CreateBoardInput!): BoardDto!
+  deleteBoard(id: Int!): BoardDto
 
   """Create a new board group"""
   createBoardGroup(data: CreateBoardGroupInput!): BoardGroupDto!

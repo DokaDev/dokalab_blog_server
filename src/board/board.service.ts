@@ -5,6 +5,7 @@ import { plainToInstance } from 'class-transformer';
 import { CreateBoardInput } from './dto/create-board.input';
 import { BoardGroupDto } from 'src/boardgroup/dto/board-group.dto';
 import { PostDto } from 'src/post/dto/post.dto';
+import { Board } from 'generated/prisma';
 
 @Injectable()
 export class BoardService {
@@ -70,5 +71,15 @@ export class BoardService {
       .posts();
 
     return posts ? plainToInstance(PostDto, posts) : [];
+  }
+
+  async delete(id: number): Promise<BoardDto | null> {
+    return plainToInstance(
+      BoardDto,
+      await this.prisma.board.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      }),
+    );
   }
 }
