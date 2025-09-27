@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/adapters/prisma/prisma.service';
-import { BoardDto } from './dto/board.dto';
 import { plainToInstance } from 'class-transformer';
-import { CreateBoardInput } from './dto/create-board.input';
+import { PrismaService } from 'src/adapters/prisma/prisma.service';
 import { BoardGroupDto } from 'src/boardgroup/dto/board-group.dto';
 import { PostDto } from 'src/post/dto/post.dto';
-import { Board } from 'generated/prisma';
+import { BoardDto } from './dto/board.dto';
+import { CreateBoardInput } from './dto/create-board.input';
 
 @Injectable()
 export class BoardService {
