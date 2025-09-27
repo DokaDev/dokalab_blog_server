@@ -6,6 +6,7 @@ import {
   ResolveField,
   Parent,
   Mutation,
+  Context,
 } from '@nestjs/graphql';
 
 import { BoardService } from './board.service';
@@ -15,6 +16,7 @@ import { BoardGroupDto } from 'src/boardgroup/dto/board-group.dto';
 import { CreateBoardInput } from './dto/create-board.input';
 import { PostDto } from 'src/post/dto/post.dto';
 import { AdminRequired } from 'src/auth/context/decorators/admin-required.decorator';
+import { RequestContext } from 'src/auth/context/request-context';
 
 @Resolver(() => BoardDto)
 export class BoardResolver {
@@ -36,8 +38,8 @@ export class BoardResolver {
 
   // --------------------
   @Query(() => [BoardDto], { description: 'Get all boards' })
-  async findAllBoards(): Promise<BoardDto[]> {
-    return await this.boardService.findAll();
+  async findAllBoards(@Context() context: RequestContext): Promise<BoardDto[]> {
+    return await this.boardService.findAll(context);
   }
 
   @Query(() => BoardDto, { description: 'Get a board by ID', nullable: true })

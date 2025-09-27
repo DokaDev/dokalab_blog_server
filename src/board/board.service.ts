@@ -5,6 +5,7 @@ import { BoardGroupDto } from 'src/boardgroup/dto/board-group.dto';
 import { PostDto } from 'src/post/dto/post.dto';
 import { BoardDto } from './dto/board.dto';
 import { CreateBoardInput } from './dto/create-board.input';
+import { RequestContext } from 'src/auth/context/request-context';
 
 @Injectable()
 export class BoardService {
@@ -14,10 +15,22 @@ export class BoardService {
    * Get all boards
    * @returns Array of BoardDto
    */
-  async findAll(): Promise<BoardDto[]> {
+  async findAll(context: RequestContext): Promise<BoardDto[]> {
+    // const boards = await this.prisma.board.findMany({
+    //   where: {
+    //     deletedAt: null,
+    //   },
+    // });
+
+    // return plainToInstance(BoardDto, boards);
+    const where = {};
+    if (!context.currentUser?.isAdmin) {
+      Object.assign(where, { deletedAt: null });
+    }
     const boards = await this.prisma.board.findMany({
-      where: {
-        deletedAt: null,
+      where,
+      orderBy: {
+        id: 'asc',
       },
     });
 
