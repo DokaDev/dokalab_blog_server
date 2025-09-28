@@ -8,23 +8,39 @@ import { calculateReadingTime } from 'src/utils/readtime/readtime.util';
 import { UpdatePostInput } from './dto/update-post.input';
 import { GraphQLError } from 'graphql';
 import { AttachmentDto } from 'src/attachment/dto/attachment.dto';
+import { RequestContext } from 'src/auth/context/request-context';
 
 @Injectable()
 export class PostService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(): Promise<PostDto[]> {
+  async findAll(context: RequestContext): Promise<PostDto[]> {
+    const where: { deletedAt?: null } = {};
+    if (!context.currentUser?.isAdmin) {
+      where.deletedAt = null;
+    }
     const posts = await this.prisma.post.findMany({
-      where: {
-        deletedAt: null,
+      where,
+      orderBy: {
+        id: 'desc',
       },
     });
 
     return plainToInstance(PostDto, posts);
   }
 
-  async findById(id: number): Promise<PostDto | null> {
-    const post = await this.prisma.post.findUnique({ where: { id } });
+  async findById(context: RequestContext, id: number): Promise<PostDto | null> {
+    const where: { id: number; deletedAt?: null } = { id };
+    if (!context.currentUser?.isAdmin) {
+      where.deletedAt = null;
+    }
+    const post = await this.prisma.post.findUnique({
+      where,
+    });
+    if (!post) {
+      return null;
+    }
+
     return plainToInstance(PostDto, post);
   }
 
@@ -59,8 +75,11 @@ export class PostService {
     }
   }
 
-  async update(input: UpdatePostInput): Promise<PostDto> {
-    const existingPost = await this.findById(input.id);
+  async update(
+    context: RequestContext,
+    input: UpdatePostInput,
+  ): Promise<PostDto> {
+    const existingPost = await this.findById(context, input.id);
     if (!existingPost) {
       throw new GraphQLError('Post not found', {
         extensions: { code: 'NOT_FOUND' },

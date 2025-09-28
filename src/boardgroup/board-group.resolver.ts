@@ -9,12 +9,12 @@ import {
   Resolver,
 } from '@nestjs/graphql';
 
-import { RequestContext } from 'src/auth/context/request-context';
+import { AdminRequired } from 'src/auth/context/decorators/admin-required.decorator';
 import { BoardDto } from 'src/board/dto/board.dto';
 import { BoardGroupService } from './board-group.service';
 import { BoardGroupDto } from './dto/board-group.dto';
 import { CreateBoardGroupInput } from './dto/create-board-group.input';
-import { AdminRequired } from 'src/auth/context/decorators/admin-required.decorator';
+import { RequestContext } from 'src/auth/context/request-context';
 
 @Resolver(() => BoardGroupDto)
 export class BoardGroupResolver {
@@ -23,18 +23,20 @@ export class BoardGroupResolver {
   @ResolveField(() => [BoardDto], {
     description: 'List of boards in the group',
   })
-  async boards(@Parent() boardGroup: BoardGroupDto): Promise<BoardDto[]> {
-    return await this.boardGroupService.findBoardsByBoardGroupId(boardGroup.id); // Fluent API
+  async boards(
+    @Context() context: RequestContext,
+    @Parent() boardGroup: BoardGroupDto,
+  ): Promise<BoardDto[]> {
+    return await this.boardGroupService.findBoardsByBoardGroupId(
+      context,
+      boardGroup.id,
+    ); // Fluent API
   }
 
   // -------------------
 
   @Query(() => [BoardGroupDto], { description: 'Get all board groups' })
-  async findAllBoardGroups(
-    @Context() context: RequestContext,
-  ): Promise<BoardGroupDto[]> {
-    console.log('context - currentUser', context.currentUser);
-
+  async findAllBoardGroups(): Promise<BoardGroupDto[]> {
     return await this.boardGroupService.findAll();
   }
 

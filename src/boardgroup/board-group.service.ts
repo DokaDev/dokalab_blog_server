@@ -1,27 +1,42 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/adapters/prisma/prisma.service';
-import { BoardGroupDto } from './dto/board-group.dto';
 import { plainToInstance } from 'class-transformer';
-import { CreateBoardGroupInput } from './dto/create-board-group.input';
+import { PrismaService } from 'src/adapters/prisma/prisma.service';
 import { BoardDto } from 'src/board/dto/board.dto';
+import { BoardGroupDto } from './dto/board-group.dto';
+import { CreateBoardGroupInput } from './dto/create-board-group.input';
+import { RequestContext } from 'src/auth/context/request-context';
 
 @Injectable()
 export class BoardGroupService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(): Promise<BoardGroupDto[]> {
-    const boardGroups = await this.prisma.boardGroup.findMany();
+    const boardGroups = await this.prisma.boardGroup.findMany({
+      orderBy: {
+        id: 'desc',
+      },
+    });
+
     return plainToInstance(BoardGroupDto, boardGroups);
   }
 
-  async findBoardsByBoardGroupId(id: number): Promise<BoardDto[]> {
-    const boards = await this.prisma.boardGroup
-      .findUnique({ where: { id: id } })
-      ?.boards({
-        where: {
-          deletedAt: null,
-        },
-      });
+  async findBoardsByBoardGroupId(
+    context: RequestContext,
+    id: number,
+  ): Promise<BoardDto[]> {
+    const where = { boardGroupId: id } as {
+      boardGroupId: number;
+      deletedAt?: null;
+    };
+    if (!context.currentUser?.isAdmin) {
+      where.deletedAt = null;
+    }
+    const boards = await this.prisma.board.findMany({
+      where,
+      orderBy: {
+        id: 'desc',
+      },
+    });
 
     return boards ? plainToInstance(BoardDto, boards) : [];
   }

@@ -1,5 +1,6 @@
 import {
   Args,
+  Context,
   Int,
   Mutation,
   Parent,
@@ -18,6 +19,7 @@ import { ONE_MINUTE_IN_S } from 'src/common/constants/time.constant';
 import { CreatePostInput } from './dto/create-post.input';
 import { PostDto } from './dto/post.dto';
 import { UpdatePostInput } from './dto/update-post.input';
+import { RequestContext } from 'src/auth/context/request-context';
 
 @Resolver(() => PostDto)
 export class PostResolver {
@@ -39,12 +41,13 @@ export class PostResolver {
   // -------------------
 
   @Query(() => [PostDto])
-  async findAllPosts(): Promise<PostDto[]> {
-    return await this.postService.findAll();
+  async findAllPosts(@Context() context: RequestContext): Promise<PostDto[]> {
+    return await this.postService.findAll(context);
   }
 
   @Query(() => PostDto, { nullable: true })
   async findPostById(
+    @Context() context: RequestContext,
     @Args('id', { type: () => Int }) id: number,
   ): Promise<PostDto | null> {
     const key: string = `post:${id}`;
@@ -53,7 +56,7 @@ export class PostResolver {
     if (cache) {
       return cache;
     } else {
-      const postFromDb = await this.postService.findById(id);
+      const postFromDb = await this.postService.findById(context, id);
       if (postFromDb) {
         await this.cacheService.setCache<PostDto>(
           key,
@@ -84,8 +87,11 @@ export class PostResolver {
 
   @Mutation(() => PostDto)
   @AdminRequired()
-  async updatePost(@Args('input') input: UpdatePostInput): Promise<PostDto> {
-    const post = await this.postService.findById(input.id);
+  async updatePost(
+    @Context() context: RequestContext,
+    @Args('input') input: UpdatePostInput,
+  ): Promise<PostDto> {
+    const post = await this.postService.findById(context, input.id);
     if (!post) {
       throw new Error('Post not found');
     }
@@ -94,7 +100,7 @@ export class PostResolver {
     const key: string = `post:${input.id}`;
     await this.cacheService.deleteCache(key);
 
-    const updatedPost = await this.postService.update(input);
+    const updatedPost = await this.postService.update(context, input);
 
     // refresh cache
     await this.cacheService.setCache<PostDto>(
@@ -109,9 +115,10 @@ export class PostResolver {
   @Mutation(() => PostDto, { nullable: true })
   @AdminRequired()
   async deletePost(
+    @Context() context: RequestContext,
     @Args('id', { type: () => Int }) id: number,
   ): Promise<PostDto | null> {
-    const post = await this.postService.findById(id);
+    const post = await this.postService.findById(context, id);
     if (!post) {
       throw new Error('Post not found');
     }

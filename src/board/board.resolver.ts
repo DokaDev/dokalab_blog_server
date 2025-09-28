@@ -32,8 +32,11 @@ export class BoardResolver {
   }
 
   @ResolveField(() => [PostDto])
-  async posts(@Parent() board: BoardDto): Promise<PostDto[]> {
-    return await this.boardService.findPostsByBoardId(board.id);
+  async posts(
+    @Context() context: RequestContext,
+    @Parent() board: BoardDto,
+  ): Promise<PostDto[]> {
+    return await this.boardService.findPostsByBoardId(context, board.id);
   }
 
   // --------------------
@@ -44,9 +47,10 @@ export class BoardResolver {
 
   @Query(() => BoardDto, { description: 'Get a board by ID', nullable: true })
   async findBoardById(
+    @Context() context: RequestContext,
     @Args('id', { type: () => Int }) id: number,
   ): Promise<BoardDto | null> {
-    return await this.boardService.findById(id);
+    return await this.boardService.findById(context, id);
   }
 
   // --------------------

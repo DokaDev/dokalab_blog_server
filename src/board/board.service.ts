@@ -6,6 +6,7 @@ import { PostDto } from 'src/post/dto/post.dto';
 import { BoardDto } from './dto/board.dto';
 import { CreateBoardInput } from './dto/create-board.input';
 import { RequestContext } from 'src/auth/context/request-context';
+import { GraphQLError } from 'graphql';
 
 @Injectable()
 export class BoardService {
@@ -16,21 +17,14 @@ export class BoardService {
    * @returns Array of BoardDto
    */
   async findAll(context: RequestContext): Promise<BoardDto[]> {
-    // const boards = await this.prisma.board.findMany({
-    //   where: {
-    //     deletedAt: null,
-    //   },
-    // });
-
-    // return plainToInstance(BoardDto, boards);
-    const where = {};
+    const where: { deletedAt?: null } = {};
     if (!context.currentUser?.isAdmin) {
-      Object.assign(where, { deletedAt: null });
+      where.deletedAt = null;
     }
     const boards = await this.prisma.board.findMany({
       where,
       orderBy: {
-        id: 'asc',
+        id: 'desc',
       },
     });
 
@@ -42,10 +36,19 @@ export class BoardService {
    * @param id Board ID
    * @returns BoardDto
    */
-  async findById(id: number): Promise<BoardDto> {
+  async findById(context: RequestContext, id: number): Promise<BoardDto> {
+    const where: { id: number; deletedAt?: null } = { id };
+    if (!context.currentUser?.isAdmin) {
+      where.deletedAt = null;
+    }
     const board = await this.prisma.board.findUnique({
-      where: { id, deletedAt: null },
+      where,
     });
+    if (!board) {
+      throw new GraphQLError('Board not found', {
+        extensions: { code: 'NOT_FOUND' },
+      });
+    }
 
     return plainToInstance(BoardDto, board);
   }
@@ -75,12 +78,24 @@ export class BoardService {
   }
 
   // ---------------------
-  async findPostsByBoardId(id: number): Promise<PostDto[]> {
+  async findPostsByBoardId(
+    context: RequestContext,
+    id: number,
+  ): Promise<PostDto[]> {
+    const where: { deletedAt?: null } = {};
+    if (!context.currentUser?.isAdmin) {
+      where.deletedAt = null;
+    }
     const posts = await this.prisma.board
       .findUnique({
         where: { id },
       })
-      .posts();
+      .posts({
+        where,
+        orderBy: {
+          id: 'desc',
+        },
+      });
 
     return posts ? plainToInstance(PostDto, posts) : [];
   }

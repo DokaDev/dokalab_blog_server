@@ -30,17 +30,6 @@ type AttachmentPrepareUploadResponse {
   presignedUrl: String!
 }
 
-type BoardGroupDto {
-  """Board Group ID"""
-  id: Int!
-
-  """Board Group Title"""
-  title: String!
-
-  """List of boards in the group"""
-  boards: [BoardDto!]!
-}
-
 type PostDto {
   """ID of the post"""
   id: Int!
@@ -101,6 +90,17 @@ type BoardDto {
   """The group to which the board belongs"""
   boardGroup: BoardGroupDto
   posts: [PostDto!]!
+}
+
+type BoardGroupDto {
+  """Board Group ID"""
+  id: Int!
+
+  """Board Group Title"""
+  title: String!
+
+  """List of boards in the group"""
+  boards: [BoardDto!]!
 }
 
 type TagDto {
