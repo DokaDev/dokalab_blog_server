@@ -68,6 +68,7 @@ export class PostResolver {
     }
   }
 
+  @Query(() => PostDto, { nullable: true })
   async findPostByPostNumber(
     @Context() context: RequestContext,
     @Args('postNumber', { type: () => Int }) postNumber: number,

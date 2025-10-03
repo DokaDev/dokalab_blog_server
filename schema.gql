@@ -124,6 +124,7 @@ type Query {
   findBoardGroupById(id: Int!): BoardGroupDto
   findAllPosts: [PostDto!]!
   findPostById(id: Int!): PostDto
+  findPostByPostNumber(postNumber: Int!): PostDto
 
   """
   Retrieve all tags. Admins can see all tags, others can only see non-deleted tags.

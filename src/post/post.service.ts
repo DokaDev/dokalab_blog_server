@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Query } from '@nestjs/common';
 import { PrismaService } from 'src/adapters/prisma/prisma.service';
 import { PostDto, PostStatus } from './dto/post.dto';
 import { plainToInstance } from 'class-transformer';
