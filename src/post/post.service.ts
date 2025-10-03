@@ -207,7 +207,13 @@ export class PostService {
 
   async delete(id: number): Promise<PostDto> {
     // hard delete
-    const deletedPost = await this.prisma.post.delete({ where: { id } });
+    // const deletedPost = await this.prisma.post.delete({ where: { id } });
+
+    // soft delete
+    const deletedPost = await this.prisma.post.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
 
     return plainToInstance(PostDto, deletedPost);
   }

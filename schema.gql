@@ -122,8 +122,18 @@ type Query {
 
   """Get a board group by ID"""
   findBoardGroupById(id: Int!): BoardGroupDto
+
+  """Retrieve all posts with pagination"""
   findAllPosts(pagination: GraphQLPaginationArgs!): [PostDto!]!
+
+  """
+  Find a post by its ID. Admins can see all posts, others can only see non-deleted posts.
+  """
   findPostById(id: Int!): PostDto
+
+  """
+  Find a post by its post number. Post number is public identifier. Admins can see all posts, others can only see non-deleted posts.
+  """
   findPostByPostNumber(postNumber: Int!): PostDto
 
   """Search posts by keyword in title or content"""
@@ -157,8 +167,14 @@ type Mutation {
 
   """Delete a board group by ID"""
   deleteBoardGroup(id: Int!): BoardGroupDto
+
+  """Create a new post. Admins only."""
   createPost(input: CreatePostInput!): PostDto!
+
+  """Update an existing post. Admins only."""
   updatePost(input: UpdatePostInput!): PostDto!
+
+  """Delete a post by ID. Admins only."""
   deletePost(id: Int!): PostDto
   attachmentPrepareUpload(data: CreateAttachmentInput!): AttachmentPrepareUploadResponse!
   attachmentCompleteUpload(attachmentId: Int!): AttachmentDto

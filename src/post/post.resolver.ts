@@ -44,7 +44,9 @@ export class PostResolver {
 
   // -------------------
 
-  @Query(() => [PostDto])
+  @Query(() => [PostDto], {
+    description: 'Retrieve all posts with pagination',
+  })
   async findAllPosts(
     @Context() context: RequestContext,
     @OffsetPaginationArgs() paginationArgs: PrismaCompatiblePaginationArgs,
@@ -52,7 +54,11 @@ export class PostResolver {
     return await this.postService.findAll(context, paginationArgs);
   }
 
-  @Query(() => PostDto, { nullable: true })
+  @Query(() => PostDto, {
+    nullable: true,
+    description:
+      'Find a post by its ID. Admins can see all posts, others can only see non-deleted posts.',
+  })
   @AdminRequired()
   async findPostById(
     @Context() context: RequestContext,
@@ -76,7 +82,11 @@ export class PostResolver {
     }
   }
 
-  @Query(() => PostDto, { nullable: true })
+  @Query(() => PostDto, {
+    nullable: true,
+    description:
+      'Find a post by its post number. Post number is public identifier. Admins can see all posts, others can only see non-deleted posts.',
+  })
   async findPostByPostNumber(
     @Context() context: RequestContext,
     @Args('postNumber', { type: () => Int }) postNumber: number,
@@ -97,7 +107,9 @@ export class PostResolver {
   }
 
   // -----------------
-  @Mutation(() => PostDto)
+  @Mutation(() => PostDto, {
+    description: 'Create a new post. Admins only.',
+  })
   @AdminRequired()
   async createPost(@Args('input') input: CreatePostInput): Promise<PostDto> {
     const newPost = await this.postService.create(input);
@@ -113,7 +125,9 @@ export class PostResolver {
     return newPost;
   }
 
-  @Mutation(() => PostDto)
+  @Mutation(() => PostDto, {
+    description: 'Update an existing post. Admins only.',
+  })
   @AdminRequired()
   async updatePost(
     @Context() context: RequestContext,
@@ -140,7 +154,10 @@ export class PostResolver {
     return updatedPost;
   }
 
-  @Mutation(() => PostDto, { nullable: true })
+  @Mutation(() => PostDto, {
+    nullable: true,
+    description: 'Delete a post by ID. Admins only.',
+  })
   @AdminRequired()
   async deletePost(
     @Context() context: RequestContext,
