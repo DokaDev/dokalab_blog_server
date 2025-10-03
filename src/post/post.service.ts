@@ -52,7 +52,7 @@ export class PostService {
           data: {
             title: input.title,
             content: input.content,
-            rendredContent: input.content, // TODO: Markdown to HTML 변환 로직 추가
+            renderedContent: input.content, // TODO: Markdown to HTML 변환 로직 추가
             boardId: input.boardId,
           },
         }),
@@ -66,7 +66,7 @@ export class PostService {
             postNumber: await this.getNextPostNumber(),
             title: input.title,
             content: input.content,
-            rendredContent: input.content, // TODO: Markdown to HTML 변환 로직 추가
+            renderedContent: input.content, // TODO: Markdown to HTML 변환 로직 추가
             boardId: input.boardId,
             status: PostStatus.PUBLISHED,
             publishedAt: new Date(),
