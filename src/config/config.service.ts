@@ -15,6 +15,7 @@ export const { TypedConfigService, TypedConfigModule } = createTypedConfig({
   JWT_SECRET: Joi.string()
     .min(32)
     .default('your_jwt_secret_key_here_at_least_32_characters_long_dev'),
+  ES_NODE: Joi.string().default('http://localhost:9200'),
 });
 
 export type TypedConfigService = InstanceType<typeof TypedConfigService>;

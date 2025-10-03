@@ -1,0 +1,69 @@
+import { Client } from '@elastic/elasticsearch';
+import { IndicesCreateRequest } from 'node_modules/@elastic/elasticsearch/lib/api/types';
+
+async function main() {
+  console.log('Initializing Elasticsearch indices...');
+
+  const esClient = new Client({
+    node: process.env.ES_NODE || 'http://localhost:9200',
+  });
+
+  const indexName = 'blog_posts_v1';
+
+  const exists = await esClient.indices.exists({
+    index: indexName,
+  });
+  if (exists) {
+    console.log(`Index "${indexName}" already exists. Skipping creation.`);
+    return;
+  }
+
+  const settings = {
+    number_of_shards: 1,
+    number_of_replicas: 1,
+    analysis: {
+      analyzer: {
+        default: {
+          type: 'standard',
+        },
+      },
+    },
+  } as const;
+
+  const mappings = {
+    properties: {
+      id: { type: 'keyword' },
+      title: {
+        type: 'text',
+        analyzer: 'standard',
+        fields: {
+          raw: {
+            type: 'keyword',
+          },
+        },
+      },
+      content: {
+        type: 'text',
+        analyzer: 'standard',
+      },
+      plainContent: {
+        type: 'text',
+        analyzer: 'standard',
+      },
+      createdAt: {
+        type: 'date',
+      },
+    },
+  } as const;
+
+  const body: IndicesCreateRequest = {
+    index: indexName,
+    settings,
+    mappings,
+  };
+
+  await esClient.indices.create(body);
+
+  console.log(`Index "${indexName}" created successfully.`);
+}
+main();

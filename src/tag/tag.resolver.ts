@@ -40,7 +40,11 @@ export class TagResolver {
   })
   async searchTags(
     @Context() context: RequestContext,
-    @Args('keyword', { type: () => String }) keyword: string,
+    @Args('keyword', {
+      type: () => String,
+      description: 'Keyword to search for tags',
+    })
+    keyword: string,
   ): Promise<TagDto[]> {
     return this.tagService.searchTags(context, keyword);
   }

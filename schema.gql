@@ -150,7 +150,10 @@ type Query {
   findTagById(id: Int!): TagDto
 
   """Search for tags by keyword. Supports prefix search."""
-  searchTags(keyword: String!): [TagDto!]!
+  searchTags(
+    """Keyword to search for tags"""
+    keyword: String!
+  ): [TagDto!]!
 }
 
 input GraphQLPaginationArgs {
