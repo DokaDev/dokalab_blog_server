@@ -53,7 +53,7 @@ model Post {
   title     String  @db.VarChar(256)
 
   content   String  @db.Text()
-  rendredContent String @db.Text() @map("rendered_content") // SEO 및 Render Optimize 용 HTML 렌더링 결과
+  renderedContent String? @db.Text() @map("rendered_content") // SEO 및 Render Optimize 용 HTML 렌더링 결과
 
   status    PostStatus @default(DRAFT)
 
