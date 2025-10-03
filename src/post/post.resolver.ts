@@ -46,6 +46,7 @@ export class PostResolver {
   }
 
   @Query(() => PostDto, { nullable: true })
+  @AdminRequired()
   async findPostById(
     @Context() context: RequestContext,
     @Args('id', { type: () => Int }) id: number,
