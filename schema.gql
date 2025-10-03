@@ -184,6 +184,12 @@ input CreatePostInput {
   """Content of the post"""
   content: String!
 
+  """Rendered content of the post"""
+  renderedContent: String
+
+  """Plain text content of the post"""
+  plainContent: String
+
   """Board ID that the post belongs to"""
   boardId: Int!
 

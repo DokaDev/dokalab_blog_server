@@ -1,4 +1,5 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
+import { IsInt, IsString } from 'class-validator';
 
 @InputType()
 export class UpdatePostInput {
@@ -6,20 +7,25 @@ export class UpdatePostInput {
   id: number;
 
   @Field(() => String)
+  @IsString()
   title: string;
 
   @Field(() => String)
+  @IsString()
   content: string;
 
   @Field(() => String, { nullable: true })
-  renderedContent?: string;
+  @IsString()
+  renderedContent?: string | null;
 
   @Field(() => String, { nullable: true })
-  plainContent?: string;
+  @IsString()
+  plainContent?: string | null;
 
   @Field(() => Boolean, { defaultValue: false })
   isDraft: boolean;
 
   @Field(() => Int, { nullable: true })
-  boardId?: number;
+  @IsInt()
+  boardId?: number | null;
 }

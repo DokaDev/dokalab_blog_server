@@ -67,27 +67,47 @@ export class PostService {
 
   // TODO: renderedContent, plainContent 처리(Draft 상태에서는 제외)
   async create(input: CreatePostInput): Promise<PostDto> {
-    if (input.isDraft) {
+    const { title, content, plainContent, renderedContent, boardId, isDraft } =
+      input;
+
+    if (isDraft) {
       return plainToInstance(
         PostDto,
         await this.prisma.post.create({
           data: {
-            title: input.title,
-            content: input.content,
-            boardId: input.boardId,
+            title,
+            content,
+            boardId,
           },
         }),
       );
     } else {
-      const readTime = calculateReadingTime(input.content);
+      // draft아닐 경우 plainContent, renderedContent가 반드시 있어야 함
+      if (!plainContent) {
+        throw new GraphQLError('plainContent is required for published post', {
+          extensions: { code: 'BAD_USER_INPUT' },
+        });
+      }
+      if (!renderedContent) {
+        throw new GraphQLError(
+          'renderedContent is required for published post',
+          {
+            extensions: { code: 'BAD_USER_INPUT' },
+          },
+        );
+      }
+
+      const readTime = calculateReadingTime(plainContent);
       return plainToInstance(
         PostDto,
         await this.prisma.post.create({
           data: {
             postNumber: await this.getNextPostNumber(),
-            title: input.title,
-            content: input.content,
-            boardId: input.boardId,
+            title,
+            content,
+            renderedContent,
+            plainContent,
+            boardId,
             status: PostStatus.PUBLISHED,
             publishedAt: new Date(),
             readTime,

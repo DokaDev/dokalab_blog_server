@@ -11,6 +11,20 @@ export class CreatePostInput {
   @IsString()
   content: string;
 
+  @Field(() => String, {
+    description: 'Rendered content of the post',
+    nullable: true,
+  })
+  @IsString()
+  renderedContent?: string | null;
+
+  @Field(() => String, {
+    description: 'Plain text content of the post',
+    nullable: true,
+  })
+  @IsString()
+  plainContent?: string | null;
+
   @Field(() => Int, { description: 'Board ID that the post belongs to' })
   @IsInt()
   boardId: number;
