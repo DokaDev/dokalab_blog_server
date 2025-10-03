@@ -51,7 +51,9 @@ model Post {
   postNumber  Int? @map("post_number") // board 내에서의 고유번호, 1부터 시작
 
   title     String  @db.VarChar(256)
+
   content   String  @db.Text()
+  rendredContent String @db.Text() @map("rendered_content") // SEO 및 Render Optimize 용 HTML 렌더링 결과
 
   status    PostStatus @default(DRAFT)
 
