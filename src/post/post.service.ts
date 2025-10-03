@@ -29,12 +29,33 @@ export class PostService {
     return plainToInstance(PostDto, posts);
   }
 
-  async findById(context: RequestContext, id: number): Promise<PostDto | null> {
+  async findPostById(
+    context: RequestContext,
+    id: number,
+  ): Promise<PostDto | null> {
     const where: { id: number; deletedAt?: null } = { id };
     if (!context.currentUser?.isAdmin) {
       where.deletedAt = null;
     }
     const post = await this.prisma.post.findUnique({
+      where,
+    });
+    if (!post) {
+      return null;
+    }
+
+    return plainToInstance(PostDto, post);
+  }
+
+  async findPostByPostNumber(
+    context: RequestContext,
+    postNumber: number,
+  ): Promise<PostDto | null> {
+    const where: { postNumber: number; deletedAt?: null } = { postNumber };
+    if (!context.currentUser?.isAdmin) {
+      where.deletedAt = null;
+    }
+    const post = await this.prisma.post.findFirst({
       where,
     });
     if (!post) {
@@ -81,7 +102,7 @@ export class PostService {
     context: RequestContext,
     input: UpdatePostInput,
   ): Promise<PostDto> {
-    const existingPost = await this.findById(context, input.id);
+    const existingPost = await this.findPostById(context, input.id);
     if (!existingPost) {
       throw new GraphQLError('Post not found', {
         extensions: { code: 'NOT_FOUND' },

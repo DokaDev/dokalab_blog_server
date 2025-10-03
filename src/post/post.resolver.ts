@@ -56,7 +56,7 @@ export class PostResolver {
     if (cache) {
       return cache;
     } else {
-      const postFromDb = await this.postService.findById(context, id);
+      const postFromDb = await this.postService.findPostById(context, id);
       if (postFromDb) {
         await this.cacheService.setCache<PostDto>(
           key,
@@ -66,6 +66,13 @@ export class PostResolver {
       }
       return postFromDb;
     }
+  }
+
+  async findPostByPostNumber(
+    @Context() context: RequestContext,
+    @Args('postNumber', { type: () => Int }) postNumber: number,
+  ): Promise<PostDto | null> {
+    return await this.postService.findPostByPostNumber(context, postNumber);
   }
 
   // -----------------
@@ -91,7 +98,7 @@ export class PostResolver {
     @Context() context: RequestContext,
     @Args('input') input: UpdatePostInput,
   ): Promise<PostDto> {
-    const post = await this.postService.findById(context, input.id);
+    const post = await this.postService.findPostById(context, input.id);
     if (!post) {
       throw new Error('Post not found');
     }
@@ -118,7 +125,7 @@ export class PostResolver {
     @Context() context: RequestContext,
     @Args('id', { type: () => Int }) id: number,
   ): Promise<PostDto | null> {
-    const post = await this.postService.findById(context, id);
+    const post = await this.postService.findPostById(context, id);
     if (!post) {
       throw new Error('Post not found');
     }
