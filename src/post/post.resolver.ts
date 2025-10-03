@@ -156,7 +156,7 @@ export class PostResolver {
 
   @Mutation(() => PostDto, {
     nullable: true,
-    description: 'Delete a post by ID. Admins only.',
+    description: 'Delete a post by ID. Admins only. (Soft Delete)',
   })
   @AdminRequired()
   async deletePost(

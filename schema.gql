@@ -174,7 +174,7 @@ type Mutation {
   """Update an existing post. Admins only."""
   updatePost(input: UpdatePostInput!): PostDto!
 
-  """Delete a post by ID. Admins only."""
+  """Delete a post by ID. Admins only. (Soft Delete)"""
   deletePost(id: Int!): PostDto
   attachmentPrepareUpload(data: CreateAttachmentInput!): AttachmentPrepareUploadResponse!
   attachmentCompleteUpload(attachmentId: Int!): AttachmentDto
