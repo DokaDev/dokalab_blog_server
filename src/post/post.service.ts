@@ -9,18 +9,24 @@ import { UpdatePostInput } from './dto/update-post.input';
 import { GraphQLError } from 'graphql';
 import { AttachmentDto } from 'src/attachment/dto/attachment.dto';
 import { RequestContext } from 'src/auth/context/request-context';
+import { PrismaCompatiblePaginationArgs } from 'src/common/pagination.util';
 
 @Injectable()
 export class PostService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(context: RequestContext): Promise<PostDto[]> {
+  async findAll(
+    context: RequestContext,
+    paginationArgs: PrismaCompatiblePaginationArgs,
+  ): Promise<PostDto[]> {
     const where: { deletedAt?: null } = {};
+
     if (!context.currentUser?.isAdmin) {
       where.deletedAt = null;
     }
     const posts = await this.prisma.post.findMany({
       where,
+      ...paginationArgs,
       orderBy: {
         id: 'desc',
       },

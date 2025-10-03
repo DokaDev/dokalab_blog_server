@@ -122,7 +122,7 @@ type Query {
 
   """Get a board group by ID"""
   findBoardGroupById(id: Int!): BoardGroupDto
-  findAllPosts: [PostDto!]!
+  findAllPosts(pagination: GraphQLPaginationArgs!): [PostDto!]!
   findPostById(id: Int!): PostDto
   findPostByPostNumber(postNumber: Int!): PostDto
 
@@ -138,6 +138,11 @@ type Query {
 
   """Search for tags by keyword. Supports prefix search."""
   searchTags(keyword: String!): [TagDto!]!
+}
+
+input GraphQLPaginationArgs {
+  pageNumber: Float!
+  pageSize: Float!
 }
 
 type Mutation {

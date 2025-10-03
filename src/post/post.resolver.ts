@@ -20,6 +20,10 @@ import { CreatePostInput } from './dto/create-post.input';
 import { PostDto } from './dto/post.dto';
 import { UpdatePostInput } from './dto/update-post.input';
 import { RequestContext } from 'src/auth/context/request-context';
+import {
+  OffsetPaginationArgs,
+  PrismaCompatiblePaginationArgs,
+} from 'src/common/pagination.util';
 
 @Resolver(() => PostDto)
 export class PostResolver {
@@ -41,8 +45,11 @@ export class PostResolver {
   // -------------------
 
   @Query(() => [PostDto])
-  async findAllPosts(@Context() context: RequestContext): Promise<PostDto[]> {
-    return await this.postService.findAll(context);
+  async findAllPosts(
+    @Context() context: RequestContext,
+    @OffsetPaginationArgs() paginationArgs: PrismaCompatiblePaginationArgs,
+  ): Promise<PostDto[]> {
+    return await this.postService.findAll(context, paginationArgs);
   }
 
   @Query(() => PostDto, { nullable: true })
