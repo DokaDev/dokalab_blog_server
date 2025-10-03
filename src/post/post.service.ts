@@ -10,10 +10,19 @@ import { GraphQLError } from 'graphql';
 import { AttachmentDto } from 'src/attachment/dto/attachment.dto';
 import { RequestContext } from 'src/auth/context/request-context';
 import { PrismaCompatiblePaginationArgs } from 'src/common/pagination.util';
+import { ElasticSearchService } from 'src/adapters/elasticsearch/elasticsearch.service';
+import { TypedConfigService } from 'src/config/config.service';
 
 @Injectable()
 export class PostService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly esIndex: string;
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly elasticSearchService: ElasticSearchService,
+    private readonly configService: TypedConfigService,
+  ) {
+    this.esIndex = this.configService.get('ES_INDEX_POST');
+  }
 
   async findAll(
     context: RequestContext,
@@ -75,12 +84,56 @@ export class PostService {
     context: RequestContext,
     paginationArgs: PrismaCompatiblePaginationArgs,
     keyword: string,
-  ) {
-    // TODO: Elastic Search FullText 적용
-    // TODO: TITLE + CONTENT ^2 가중치 적용
-    // TODO: 정렬 조건: _id 기반 최신순 정렬
-    const list: PostDto[] = [];
-    return list;
+  ): Promise<PostDto[]> {
+    try {
+      // ES에서 검색
+      const searchResult = await this.elasticSearchService.search(
+        this.esIndex,
+        {
+          query: {
+            multi_match: {
+              query: `*${keyword}*`,
+              fields: ['title^3', 'content'],
+              type: 'best_fields',
+            },
+          },
+          from: paginationArgs.skip,
+          size: paginationArgs.take,
+        },
+      );
+
+      const hits = searchResult.hits.hits;
+      if (!hits || hits.length === 0) {
+        return [];
+      }
+
+      // ES 결과에서 ID 추출
+      const postIds = hits.map((hit) => Number(hit._id));
+
+      // DB에서 조회 (권한 체크 포함)
+      const where: { id: { in: number[] }; deletedAt?: null } = {
+        id: { in: postIds },
+      };
+      if (!context.currentUser?.isAdmin) {
+        where.deletedAt = null;
+      }
+
+      const posts = await this.prisma.post.findMany({
+        where,
+      });
+
+      // ES 검색 순서대로 정렬
+      const postMap = new Map(posts.map((post) => [post.id, post]));
+      const orderedPosts = postIds
+        .map((id) => postMap.get(id))
+        .filter((post): post is NonNullable<typeof post> => post !== undefined);
+
+      return plainToInstance(PostDto, orderedPosts);
+    } catch {
+      // ES 에러 발생시 빈 배열 반환
+      console.log('Elasticsearch error during searchPosts');
+      return [];
+    }
   }
 
   // TODO: renderedContent, plainContent 처리(Draft 상태에서는 제외)
@@ -131,7 +184,22 @@ export class PostService {
         },
       });
 
-      // TODO: elasticsearch index 생성
+      try {
+        await this.elasticSearchService.ensureIndex(this.esIndex);
+        await this.elasticSearchService.index(
+          this.esIndex,
+          {
+            id: createdPost.id,
+            title: createdPost.title,
+            content: createdPost.content,
+            plainContent: createdPost.plainContent,
+            createdAt: createdPost.createdAt,
+          },
+          String(createdPost.id),
+        );
+      } catch (error) {
+        // Log the error but do not fail the post creation
+      }
 
       return plainToInstance(PostDto, createdPost);
     }

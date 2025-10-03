@@ -65,6 +65,13 @@ export class ElasticSearchService implements OnModuleDestroy {
     });
   }
 
+  public async ensureIndex(index: string): Promise<void> {
+    const exists = await this.client.indices.exists({ index });
+    if (!exists) {
+      await this.client.indices.create({ index });
+    }
+  }
+
   public async delete(index: string, id: string) {
     return this.client.delete({
       index,

@@ -16,6 +16,7 @@ export const { TypedConfigService, TypedConfigModule } = createTypedConfig({
     .min(32)
     .default('your_jwt_secret_key_here_at_least_32_characters_long_dev'),
   ES_NODE: Joi.string().default('http://localhost:9200'),
+  ES_INDEX_POST: Joi.string().default('blog_posts_v1'),
 });
 
 export type TypedConfigService = InstanceType<typeof TypedConfigService>;
