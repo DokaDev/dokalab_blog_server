@@ -71,6 +71,18 @@ export class PostService {
     return plainToInstance(PostDto, post);
   }
 
+  async searchPosts(
+    context: RequestContext,
+    paginationArgs: PrismaCompatiblePaginationArgs,
+    keyword: string,
+  ) {
+    // TODO: Elastic Search FullText 적용
+    // TODO: TITLE + CONTENT ^2 가중치 적용
+    // TODO: 정렬 조건: _id 기반 최신순 정렬
+    const list: PostDto[] = [];
+    return list;
+  }
+
   // TODO: renderedContent, plainContent 처리(Draft 상태에서는 제외)
   async create(input: CreatePostInput): Promise<PostDto> {
     const { title, content, plainContent, renderedContent, boardId, isDraft } =

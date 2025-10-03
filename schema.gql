@@ -125,6 +125,7 @@ type Query {
   findAllPosts(pagination: GraphQLPaginationArgs!): [PostDto!]!
   findPostById(id: Int!): PostDto
   findPostByPostNumber(postNumber: Int!): PostDto
+  searchPosts(pagination: GraphQLPaginationArgs!, keyword: String!): [PostDto!]! @deprecated(reason: "not deprecated but will be implemented in the future")
 
   """
   Retrieve all tags. Admins can see all tags, others can only see non-deleted tags.

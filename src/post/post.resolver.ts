@@ -13,17 +13,17 @@ import { PostService } from './post.service';
 
 import { AttachmentDto } from 'src/attachment/dto/attachment.dto';
 import { AdminRequired } from 'src/auth/context/decorators/admin-required.decorator';
+import { RequestContext } from 'src/auth/context/request-context';
 import { BoardDto } from 'src/board/dto/board.dto';
 import { CacheService } from 'src/cache/cache.service';
 import { ONE_MINUTE_IN_S } from 'src/common/constants/time.constant';
-import { CreatePostInput } from './dto/create-post.input';
-import { PostDto } from './dto/post.dto';
-import { UpdatePostInput } from './dto/update-post.input';
-import { RequestContext } from 'src/auth/context/request-context';
 import {
   OffsetPaginationArgs,
   PrismaCompatiblePaginationArgs,
 } from 'src/common/pagination.util';
+import { CreatePostInput } from './dto/create-post.input';
+import { PostDto } from './dto/post.dto';
+import { UpdatePostInput } from './dto/update-post.input';
 
 @Resolver(() => PostDto)
 export class PostResolver {
@@ -82,6 +82,17 @@ export class PostResolver {
     @Args('postNumber', { type: () => Int }) postNumber: number,
   ): Promise<PostDto | null> {
     return await this.postService.findPostByPostNumber(context, postNumber);
+  }
+
+  @Query(() => [PostDto], {
+    deprecationReason: 'not deprecated but will be implemented in the future',
+  })
+  async searchPosts(
+    @Context() context: RequestContext,
+    @OffsetPaginationArgs() paginationArgs: PrismaCompatiblePaginationArgs,
+    @Args('keyword') keyword: string,
+  ): Promise<PostDto[]> {
+    return await this.postService.searchPosts(context, paginationArgs, keyword);
   }
 
   // -----------------
