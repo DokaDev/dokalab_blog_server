@@ -193,9 +193,12 @@ input CreatePostInput {
 
 input UpdatePostInput {
   id: Int!
-  title: String
-  content: String
+  title: String!
+  content: String!
+  renderedContent: String
+  plainContent: String
   isDraft: Boolean! = false
+  boardId: Int
 }
 
 input CreateAttachmentInput {

@@ -5,12 +5,21 @@ export class UpdatePostInput {
   @Field(() => Int)
   id: number;
 
-  @Field({ nullable: true })
-  title?: string;
+  @Field(() => String)
+  title: string;
 
-  @Field({ nullable: true })
-  content?: string;
+  @Field(() => String)
+  content: string;
+
+  @Field(() => String, { nullable: true })
+  renderedContent?: string;
+
+  @Field(() => String, { nullable: true })
+  plainContent?: string;
 
   @Field(() => Boolean, { defaultValue: false })
   isDraft: boolean;
+
+  @Field(() => Int, { nullable: true })
+  boardId?: number;
 }

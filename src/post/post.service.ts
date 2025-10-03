@@ -65,6 +65,7 @@ export class PostService {
     return plainToInstance(PostDto, post);
   }
 
+  // TODO: renderedContent, plainContent 처리(Draft 상태에서는 제외)
   async create(input: CreatePostInput): Promise<PostDto> {
     if (input.isDraft) {
       return plainToInstance(
@@ -73,7 +74,6 @@ export class PostService {
           data: {
             title: input.title,
             content: input.content,
-            renderedContent: input.content, // TODO: Markdown to HTML 변환 로직 추가
             boardId: input.boardId,
           },
         }),
@@ -87,7 +87,6 @@ export class PostService {
             postNumber: await this.getNextPostNumber(),
             title: input.title,
             content: input.content,
-            renderedContent: input.content, // TODO: Markdown to HTML 변환 로직 추가
             boardId: input.boardId,
             status: PostStatus.PUBLISHED,
             publishedAt: new Date(),
@@ -98,48 +97,67 @@ export class PostService {
     }
   }
 
+  // TODO: renderedContent, plainContent 처리(Draft 상태에서는 제외)
   async update(
     context: RequestContext,
     input: UpdatePostInput,
   ): Promise<PostDto> {
-    const existingPost = await this.findPostById(context, input.id);
+    const {
+      id,
+      title,
+      content,
+      renderedContent,
+      plainContent,
+      isDraft,
+      boardId,
+    } = input;
+
+    const existingPost = await this.findPostById(context, id);
     if (!existingPost) {
       throw new GraphQLError('Post not found', {
         extensions: { code: 'NOT_FOUND' },
       });
     }
 
-    if (existingPost.status === PostStatus.PUBLISHED && input.isDraft) {
+    if (existingPost.status === PostStatus.PUBLISHED && isDraft) {
       throw new GraphQLError('Cannot change from PUBLISHED to DRAFT', {
         extensions: { code: 'BAD_REQUEST' },
       });
     }
 
-    if (input.isDraft) {
+    if (isDraft) {
       return plainToInstance(
         PostDto,
         await this.prisma.post.update({
-          where: { id: input.id },
+          where: { id },
           data: {
-            title: input.title ?? existingPost.title,
-            content: input.content ?? existingPost.content,
+            // not null fields
+            title,
+            content,
+
+            // optional fields
+            renderedContent: renderedContent ?? undefined,
+            plainContent: plainContent ?? undefined,
+
+            boardId: boardId ?? undefined,
           },
         }),
       );
     } else {
-      const readTime = input.content
-        ? calculateReadingTime(input.content)
+      // draft아닐 경우 plainContent가 반드시 있어야 함
+      const readTime = plainContent
+        ? calculateReadingTime(plainContent)
         : existingPost.readTime;
 
       return plainToInstance(
         PostDto,
         await this.prisma.post.update({
-          where: { id: input.id },
+          where: { id },
           data: {
             postNumber:
               existingPost.postNumber ?? (await this.getNextPostNumber()),
-            title: input.title ?? existingPost.title,
-            content: input.content ?? existingPost.content,
+            title: title ?? existingPost.title,
+            content: content ?? existingPost.content,
             status: PostStatus.PUBLISHED,
             publishedAt: new Date(),
             readTime,
