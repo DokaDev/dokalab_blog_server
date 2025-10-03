@@ -24,7 +24,7 @@ async function main() {
     analysis: {
       analyzer: {
         default: {
-          type: 'standard',
+          type: 'english',
         },
       },
     },
@@ -35,20 +35,16 @@ async function main() {
       id: { type: 'keyword' },
       title: {
         type: 'text',
-        analyzer: 'standard',
+        analyzer: 'english',
         fields: {
           raw: {
             type: 'keyword',
           },
         },
       },
-      content: {
-        type: 'text',
-        analyzer: 'standard',
-      },
       plainContent: {
         type: 'text',
-        analyzer: 'standard',
+        analyzer: 'english',
       },
       createdAt: {
         type: 'date',
