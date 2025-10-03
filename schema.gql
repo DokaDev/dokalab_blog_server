@@ -125,6 +125,8 @@ type Query {
   findAllPosts(pagination: GraphQLPaginationArgs!): [PostDto!]!
   findPostById(id: Int!): PostDto
   findPostByPostNumber(postNumber: Int!): PostDto
+
+  """Search posts by keyword in title or content"""
   searchPosts(pagination: GraphQLPaginationArgs!, keyword: String!): [PostDto!]! @deprecated(reason: "not deprecated but will be implemented in the future")
 
   """

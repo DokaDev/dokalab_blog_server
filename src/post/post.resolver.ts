@@ -85,6 +85,7 @@ export class PostResolver {
   }
 
   @Query(() => [PostDto], {
+    description: 'Search posts by keyword in title or content',
     deprecationReason: 'not deprecated but will be implemented in the future',
   })
   async searchPosts(
