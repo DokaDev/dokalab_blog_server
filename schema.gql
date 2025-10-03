@@ -124,7 +124,7 @@ type Query {
   findBoardGroupById(id: Int!): BoardGroupDto
 
   """Retrieve all posts with pagination"""
-  findAllPosts(pagination: GraphQLPaginationArgs!): [PostDto!]!
+  findAllPosts(pagination: GraphQLPaginationArgs!, filterBy: PostFilter): [PostDto!]!
 
   """
   Find a post by its ID. Admins can see all posts, others can only see non-deleted posts.

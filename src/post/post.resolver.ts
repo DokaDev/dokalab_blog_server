@@ -51,8 +51,9 @@ export class PostResolver {
   async findAllPosts(
     @Context() context: RequestContext,
     @OffsetPaginationArgs() paginationArgs: PrismaCompatiblePaginationArgs,
+    @Args('filterBy', { nullable: true }) filterBy?: PostFilter,
   ): Promise<PostDto[]> {
-    return await this.postService.findAll(context, paginationArgs);
+    return await this.postService.findAll(context, paginationArgs, filterBy);
   }
 
   @Query(() => PostDto, {

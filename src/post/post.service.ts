@@ -28,6 +28,7 @@ export class PostService {
   async findAll(
     context: RequestContext,
     paginationArgs: PrismaCompatiblePaginationArgs,
+    filterBy?: PostFilter,
   ): Promise<PostDto[]> {
     const where: { deletedAt?: null } = {};
 
