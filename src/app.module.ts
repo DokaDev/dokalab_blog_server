@@ -16,6 +16,7 @@ import { CacheModule } from './cache/cache.module';
 import { TypedConfigModule } from './config/config.service';
 import { PostModule } from './post/post.module';
 import { TagModule } from './tag/tag.module';
+import { ElasticSearchModule } from './adapters/elasticsearch/elasticsearch.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { TagModule } from './tag/tag.module';
       context: ({ req }) => req.context,
     }),
     RedisModule,
+    ElasticSearchModule,
     CacheModule,
     BoardModule,
     BoardGroupModule,
