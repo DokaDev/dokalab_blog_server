@@ -90,21 +90,34 @@ export class PostService {
   ): Promise<PostDto[]> {
     const { boardId } = filterBy || {};
     try {
-      // ES에서 검색
       // const searchResult = await this.elasticSearchService.search(
       //   this.esIndex,
       //   {
       //     query: {
-      //       multi_match: {
-      //         query: `${keyword}`,
-      //         fields: ['title', 'plainContent'],
-      //         type: 'best_fields',
+      //       bool: {
+      //         must: [
+      //           {
+      //             multi_match: {
+      //               query: `${keyword}`,
+      //               fields: ['title', 'plainContent'],
+      //               type: 'best_fields',
+      //             },
+      //           },
+      //         ],
+      //         filter: boardId
+      //           ? [
+      //               {
+      //                 term: { boardId: boardId },
+      //               },
+      //             ]
+      //           : [],
       //       },
       //     },
       //     from: paginationArgs.skip,
       //     size: paginationArgs.take,
       //   },
       // );
+      // postNumber로 정렬
       const searchResult = await this.elasticSearchService.search(
         this.esIndex,
         {
@@ -130,6 +143,7 @@ export class PostService {
           },
           from: paginationArgs.skip,
           size: paginationArgs.take,
+          sort: [{ postNumber: { order: 'desc' } }],
         },
       );
 
@@ -221,6 +235,7 @@ export class PostService {
           this.esIndex,
           {
             id: createdPost.id,
+            postNumber: createdPost.postNumber,
             title: createdPost.title,
             plainContent: createdPost.plainContent,
             createdAt: createdPost.createdAt,
@@ -265,23 +280,6 @@ export class PostService {
     }
 
     if (isDraft) {
-      // return plainToInstance(
-      //   PostDto,
-      //   await this.prisma.post.update({
-      //     where: { id },
-      //     data: {
-      //       // not null fields
-      //       title,
-      //       content,
-
-      //       // optional fields
-      //       renderedContent: renderedContent ?? undefined,
-      //       plainContent: plainContent ?? undefined,
-
-      //       boardId: boardId ?? undefined,
-      //     },
-      //   }),
-      // );
       const updatedPost = await this.prisma.post.update({
         where: { id },
         data: {
@@ -308,28 +306,35 @@ export class PostService {
             existingPost.postNumber ?? (await this.getNextPostNumber()),
           title: title ?? existingPost.title,
           content: content ?? existingPost.content,
+          renderedContent: renderedContent ?? undefined,
+          plainContent: plainContent ?? undefined,
           status: PostStatus.PUBLISHED,
           publishedAt: new Date(),
+          boardId: boardId ?? undefined,
           readTime,
         },
       });
-      return plainToInstance(PostDto, updatedPost);
 
-      // return plainToInstance(
-      //   PostDto,
-      //   await this.prisma.post.update({
-      //     where: { id },
-      //     data: {
-      //       postNumber:
-      //         existingPost.postNumber ?? (await this.getNextPostNumber()),
-      //       title: title ?? existingPost.title,
-      //       content: content ?? existingPost.content,
-      //       status: PostStatus.PUBLISHED,
-      //       publishedAt: new Date(),
-      //       readTime,
-      //     },
-      //   }),
-      // );
+      // 기존에 인덱스된 것이 있을 수도 있고 없을 수도 있음
+      try {
+        await this.elasticSearchService.ensureIndex(this.esIndex);
+        await this.elasticSearchService.index(
+          this.esIndex,
+          {
+            id: updatedPost.id,
+            postNumber: updatedPost.postNumber,
+            title: updatedPost.title,
+            plainContent: updatedPost.plainContent,
+            createdAt: updatedPost.createdAt,
+            boardId: updatedPost.boardId,
+          },
+          String(updatedPost.id),
+        );
+      } catch (error) {
+        // Log the error but do not fail the post update
+      }
+
+      return plainToInstance(PostDto, updatedPost);
     }
   }
 
@@ -342,6 +347,12 @@ export class PostService {
       where: { id },
       data: { deletedAt: new Date() },
     });
+
+    try {
+      await this.elasticSearchService.delete(this.esIndex, String(id));
+    } catch {
+      // Log the error but do not fail the post deletion
+    }
 
     return plainToInstance(PostDto, deletedPost);
   }

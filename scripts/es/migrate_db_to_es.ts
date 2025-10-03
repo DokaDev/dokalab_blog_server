@@ -26,6 +26,7 @@ async function migrate(post: Post, client: Client) {
       id: post.id.toString(),
       document: {
         id: post.id,
+        postNumber: post.postNumber,
         title: post.title,
         plainContent: post.plainContent,
         createdAt: post.createdAt,

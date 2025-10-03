@@ -35,6 +35,9 @@ async function main() {
   const mappings = {
     properties: {
       id: { type: 'keyword' },
+      postNumber: {
+        type: 'integer',
+      },
       title: {
         type: 'text',
         analyzer: 'english',
