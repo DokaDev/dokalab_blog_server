@@ -116,22 +116,24 @@ export class PostService {
       }
 
       const readTime = calculateReadingTime(plainContent);
-      return plainToInstance(
-        PostDto,
-        await this.prisma.post.create({
-          data: {
-            postNumber: await this.getNextPostNumber(),
-            title,
-            content,
-            renderedContent,
-            plainContent,
-            boardId,
-            status: PostStatus.PUBLISHED,
-            publishedAt: new Date(),
-            readTime,
-          },
-        }),
-      );
+
+      const createdPost = await this.prisma.post.create({
+        data: {
+          postNumber: await this.getNextPostNumber(),
+          title,
+          content,
+          renderedContent,
+          plainContent,
+          boardId,
+          status: PostStatus.PUBLISHED,
+          publishedAt: new Date(),
+          readTime,
+        },
+      });
+
+      // TODO: elasticsearch index 생성
+
+      return plainToInstance(PostDto, createdPost);
     }
   }
 
@@ -164,44 +166,71 @@ export class PostService {
     }
 
     if (isDraft) {
-      return plainToInstance(
-        PostDto,
-        await this.prisma.post.update({
-          where: { id },
-          data: {
-            // not null fields
-            title,
-            content,
+      // return plainToInstance(
+      //   PostDto,
+      //   await this.prisma.post.update({
+      //     where: { id },
+      //     data: {
+      //       // not null fields
+      //       title,
+      //       content,
 
-            // optional fields
-            renderedContent: renderedContent ?? undefined,
-            plainContent: plainContent ?? undefined,
+      //       // optional fields
+      //       renderedContent: renderedContent ?? undefined,
+      //       plainContent: plainContent ?? undefined,
 
-            boardId: boardId ?? undefined,
-          },
-        }),
-      );
+      //       boardId: boardId ?? undefined,
+      //     },
+      //   }),
+      // );
+      const updatedPost = await this.prisma.post.update({
+        where: { id },
+        data: {
+          // not null fields
+          title,
+          content,
+          // optional fields
+          renderedContent: renderedContent ?? undefined,
+          plainContent: plainContent ?? undefined,
+          boardId: boardId ?? undefined,
+        },
+      });
+      return plainToInstance(PostDto, updatedPost);
     } else {
       // draft아닐 경우 plainContent가 반드시 있어야 함
       const readTime = plainContent
         ? calculateReadingTime(plainContent)
         : existingPost.readTime;
 
-      return plainToInstance(
-        PostDto,
-        await this.prisma.post.update({
-          where: { id },
-          data: {
-            postNumber:
-              existingPost.postNumber ?? (await this.getNextPostNumber()),
-            title: title ?? existingPost.title,
-            content: content ?? existingPost.content,
-            status: PostStatus.PUBLISHED,
-            publishedAt: new Date(),
-            readTime,
-          },
-        }),
-      );
+      const updatedPost = await this.prisma.post.update({
+        where: { id },
+        data: {
+          postNumber:
+            existingPost.postNumber ?? (await this.getNextPostNumber()),
+          title: title ?? existingPost.title,
+          content: content ?? existingPost.content,
+          status: PostStatus.PUBLISHED,
+          publishedAt: new Date(),
+          readTime,
+        },
+      });
+      return plainToInstance(PostDto, updatedPost);
+
+      // return plainToInstance(
+      //   PostDto,
+      //   await this.prisma.post.update({
+      //     where: { id },
+      //     data: {
+      //       postNumber:
+      //         existingPost.postNumber ?? (await this.getNextPostNumber()),
+      //       title: title ?? existingPost.title,
+      //       content: content ?? existingPost.content,
+      //       status: PostStatus.PUBLISHED,
+      //       publishedAt: new Date(),
+      //       readTime,
+      //     },
+      //   }),
+      // );
     }
   }
 

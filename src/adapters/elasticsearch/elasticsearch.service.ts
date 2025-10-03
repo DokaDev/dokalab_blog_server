@@ -1,9 +1,14 @@
 import { Client } from '@elastic/elasticsearch';
-import { Injectable, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import {
+  BulkOperationContainer,
+  SearchRequest,
+} from 'node_modules/@elastic/elasticsearch/lib/api/types';
 import { TypedConfigService } from 'src/config/config.service';
 
 @Injectable()
 export class ElasticSearchService implements OnModuleDestroy {
+  private readonly logger = new Logger(ElasticSearchService.name);
   private readonly esNode: string;
 
   private esClient: Client | null = null;
@@ -13,33 +18,68 @@ export class ElasticSearchService implements OnModuleDestroy {
   }
 
   private get client(): Client {
-    return (this.esClient ??= new Client({
-      node: this.esNode,
-    }));
+    if (!this.esClient) {
+      this.esClient = new Client({
+        node: this.esNode,
+      });
+      this.logger.log(
+        `Elasticsearch client initialized for node: ${this.esNode}`,
+      );
+    }
+    return this.esClient;
   }
 
-  public async search(index: string, params: any) {
+  public async search(
+    index: string,
+    params: Omit<SearchRequest, 'index'> = {},
+  ) {
     return this.client.search({
       index,
       ...params,
     });
   }
 
-  public async bulk(body: any[]) {
+  public async bulk(operations: BulkOperationContainer[]) {
     return this.client.bulk({
-      body,
+      operations,
     });
   }
 
-  public async update(index: string, id: string, params: any) {
+  public async update(index: string, id: string, doc: Record<string, unknown>) {
     return this.client.update({
       index,
       id,
-      body: params,
+      doc,
+    });
+  }
+
+  public async index(
+    index: string,
+    document: Record<string, unknown>,
+    id?: string,
+  ) {
+    return this.client.index({
+      index,
+      id,
+      document,
+    });
+  }
+
+  public async delete(index: string, id: string) {
+    return this.client.delete({
+      index,
+      id,
     });
   }
 
   async onModuleDestroy() {
-    await this.esClient?.close();
+    if (this.esClient) {
+      try {
+        await this.esClient.close();
+        this.logger.log('Elasticsearch client closed successfully');
+      } catch (error) {
+        this.logger.error('Failed to close Elasticsearch client', error);
+      }
+    }
   }
 }
