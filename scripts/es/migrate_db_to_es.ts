@@ -29,6 +29,7 @@ async function migrate(post: Post, client: Client) {
         title: post.title,
         plainContent: post.plainContent,
         createdAt: post.createdAt,
+        boardId: post.boardId,
       },
     });
   } catch (error) {

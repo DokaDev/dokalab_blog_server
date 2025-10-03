@@ -51,6 +51,9 @@ async function main() {
       createdAt: {
         type: 'date',
       },
+      boardId: {
+        type: 'integer',
+      },
     },
   } as const;
 

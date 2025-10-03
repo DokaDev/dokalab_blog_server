@@ -1,17 +1,18 @@
-import { Injectable, Query } from '@nestjs/common';
-import { PrismaService } from 'src/adapters/prisma/prisma.service';
-import { PostDto, PostStatus } from './dto/post.dto';
+import { Injectable } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
-import { BoardDto } from 'src/board/dto/board.dto';
-import { CreatePostInput } from './dto/create-post.input';
-import { calculateReadingTime } from 'src/utils/readtime/readtime.util';
-import { UpdatePostInput } from './dto/update-post.input';
 import { GraphQLError } from 'graphql';
+import { ElasticSearchService } from 'src/adapters/elasticsearch/elasticsearch.service';
+import { PrismaService } from 'src/adapters/prisma/prisma.service';
 import { AttachmentDto } from 'src/attachment/dto/attachment.dto';
 import { RequestContext } from 'src/auth/context/request-context';
+import { BoardDto } from 'src/board/dto/board.dto';
 import { PrismaCompatiblePaginationArgs } from 'src/common/pagination.util';
-import { ElasticSearchService } from 'src/adapters/elasticsearch/elasticsearch.service';
 import { TypedConfigService } from 'src/config/config.service';
+import { calculateReadingTime } from 'src/utils/readtime/readtime.util';
+import { CreatePostInput } from './dto/create-post.input';
+import { PostFilter } from './dto/post-filter.dto';
+import { PostDto, PostStatus } from './dto/post.dto';
+import { UpdatePostInput } from './dto/update-post.input';
 
 @Injectable()
 export class PostService {
@@ -84,17 +85,46 @@ export class PostService {
     context: RequestContext,
     paginationArgs: PrismaCompatiblePaginationArgs,
     keyword: string,
+    filterBy?: PostFilter,
   ): Promise<PostDto[]> {
+    const { boardId } = filterBy || {};
     try {
       // ES에서 검색
+      // const searchResult = await this.elasticSearchService.search(
+      //   this.esIndex,
+      //   {
+      //     query: {
+      //       multi_match: {
+      //         query: `${keyword}`,
+      //         fields: ['title', 'plainContent'],
+      //         type: 'best_fields',
+      //       },
+      //     },
+      //     from: paginationArgs.skip,
+      //     size: paginationArgs.take,
+      //   },
+      // );
       const searchResult = await this.elasticSearchService.search(
         this.esIndex,
         {
           query: {
-            multi_match: {
-              query: `${keyword}`,
-              fields: ['title', 'plainContent'],
-              type: 'best_fields',
+            bool: {
+              must: [
+                {
+                  multi_match: {
+                    query: `${keyword}`,
+                    fields: ['title', 'plainContent'],
+                    type: 'best_fields',
+                  },
+                },
+              ],
+              filter: boardId
+                ? [
+                    {
+                      term: { boardId: boardId },
+                    },
+                  ]
+                : [],
             },
           },
           from: paginationArgs.skip,
@@ -193,6 +223,7 @@ export class PostService {
             title: createdPost.title,
             plainContent: createdPost.plainContent,
             createdAt: createdPost.createdAt,
+            boardId: createdPost.boardId,
           },
           String(createdPost.id),
         );

@@ -24,6 +24,7 @@ import {
 import { CreatePostInput } from './dto/create-post.input';
 import { PostDto } from './dto/post.dto';
 import { UpdatePostInput } from './dto/update-post.input';
+import { PostFilter } from './dto/post-filter.dto';
 
 @Resolver(() => PostDto)
 export class PostResolver {
@@ -102,8 +103,14 @@ export class PostResolver {
     @Context() context: RequestContext,
     @OffsetPaginationArgs() paginationArgs: PrismaCompatiblePaginationArgs,
     @Args('keyword') keyword: string,
+    @Args('filterBy', { nullable: true }) filterBy?: PostFilter,
   ): Promise<PostDto[]> {
-    return await this.postService.searchPosts(context, paginationArgs, keyword);
+    return await this.postService.searchPosts(
+      context,
+      paginationArgs,
+      keyword,
+      filterBy,
+    );
   }
 
   // -----------------
