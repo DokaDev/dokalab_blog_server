@@ -92,8 +92,8 @@ export class PostService {
         {
           query: {
             multi_match: {
-              query: `*${keyword}*`,
-              fields: ['title^3', 'content'],
+              query: `${keyword}`,
+              fields: ['title', 'plainContent'],
               type: 'best_fields',
             },
           },
@@ -191,7 +191,6 @@ export class PostService {
           {
             id: createdPost.id,
             title: createdPost.title,
-            content: createdPost.content,
             plainContent: createdPost.plainContent,
             createdAt: createdPost.createdAt,
           },

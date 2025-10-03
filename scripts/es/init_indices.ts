@@ -14,8 +14,10 @@ async function main() {
     index: indexName,
   });
   if (exists) {
-    console.log(`Index "${indexName}" already exists. Skipping creation.`);
-    return;
+    // console.log(`Index "${indexName}" already exists. Skipping creation.`);
+    // return;
+    await esClient.indices.delete({ index: indexName });
+    console.log(`Index "${indexName}" deleted.`);
   }
 
   const settings = {
